@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Computing 101 — Fiji Edition</title>
+<meta name="description" content="A self-guided intro to cloud computing for Year 11-13 students in Fiji.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1226;
+    --bg-alt:#161a3a;
+    --card:#1c2049;
+    --card-alt:#232a5c;
+    --text:#eef0ff;
+    --text-dim:#b7bce0;
+    --accent:#ff5d8f;
+    --accent2:#4dd9e8;
+    --accent3:#ffd166;
+    --accent4:#7c5cff;
+    --border:#31376e;
+    --radius:18px;
+    --maxw:1100px;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:76px;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(124,92,255,.25), transparent 45%),
+      radial-gradient(circle at 90% 10%, rgba(77,217,232,.18), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Poppins',sans-serif;}
+  h1,h2,h3{margin:0 0 .5em 0; line-height:1.2;}
+  p{margin:0 0 1em 0;}
+  a{color:var(--accent2);}
+  img,svg{max-width:100%;}
+
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 20px;}
+
+  /* ---------- Top bar / intro ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:100;
+    background:rgba(15,18,38,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width:var(--maxw); margin:0 auto; padding:10px 16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand{
+    font-family:'Poppins',sans-serif; font-weight:800; font-size:1.05rem;
+    display:flex; align-items:center; gap:8px; white-space:nowrap;
+    margin-right:6px;
+  }
+  .brand .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent4));
+    box-shadow:0 0 12px var(--accent);
+  }
+  nav.toc{
+    display:flex; gap:4px; overflow-x:auto; scrollbar-width:none;
+    flex:1;
+  }
+  nav.toc::-webkit-scrollbar{display:none;}
+  nav.toc a{
+    text-decoration:none; color:var(--text-dim); font-weight:600;
+    font-size:.82rem; padding:8px 12px; border-radius:999px;
+    white-space:nowrap; transition:.2s;
+    border:1px solid transparent;
+  }
+  nav.toc a:hover{color:var(--text); background:var(--card-alt);}
+  nav.toc a.active{
+    color:var(--bg); background:var(--accent2);
+    border-color:var(--accent2);
+  }
+  .intro-strip{
+    background:linear-gradient(90deg, rgba(124,92,255,.18), rgba(77,217,232,.1));
+    border-bottom:1px solid var(--border);
+    font-size:.85rem; color:var(--text-dim);
+    padding:8px 0;
+  }
+  .intro-strip .wrap{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .intro-strip strong{color:var(--text);}
+
+  /* ---------- Sections ---------- */
+  section{
+    padding:64px 0 56px;
+    border-bottom:1px solid rgba(255,255,255,.04);
+    scroll-margin-top:76px;
+  }
+  section:first-of-type{padding-top:48px;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.78rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--accent3); margin-bottom:10px;
+  }
+  .section-title{font-size:clamp(1.5rem,4vw,2.2rem);}
+  .lede{font-size:1.05rem; color:var(--text-dim); max-width:70ch;}
+
+  /* ---------- Hook ---------- */
+  .hero{
+    padding-top:40px;
+  }
+  .hero h1{
+    font-size:clamp(1.9rem,5.5vw,3rem);
+    background:linear-gradient(90deg,#fff,var(--accent2) 60%, var(--accent));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .app-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+    gap:12px; margin-top:24px;
+  }
+  .app-chip{
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:16px 12px; text-align:center; font-weight:600; font-size:.95rem;
+  }
+  .app-chip .emoji{font-size:1.8rem; display:block; margin-bottom:6px;}
+
+  /* ---------- Analogy ---------- */
+  .analogy-card{
+    background:linear-gradient(135deg,var(--card),var(--card-alt));
+    border:1px solid var(--border); border-radius:var(--radius);
+    padding:26px; margin-top:22px; position:relative; overflow:hidden;
+  }
+  .analogy-card::before{
+    content:"⚡"; position:absolute; right:16px; top:10px; font-size:4rem; opacity:.12;
+  }
+  .analogy-card h3{color:var(--accent3); font-size:1.1rem;}
+
+  /* ---------- Service cards ---------- */
+  .card-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:26px;
+  }
+  @media (max-width:800px){ .card-grid{grid-template-columns:1fr;} }
+  .service-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px; display:flex; flex-direction:column; gap:10px;
+  }
+  .service-card .tag{
+    align-self:flex-start; font-size:.7rem; font-weight:800; letter-spacing:.06em;
+    padding:4px 10px; border-radius:999px; color:var(--bg);
+  }
+  .service-card:nth-child(1) .tag{background:var(--accent2);}
+  .service-card:nth-child(2) .tag{background:var(--accent3);}
+  .service-card:nth-child(3) .tag{background:var(--accent);}
+  .service-card h3{font-size:1.25rem;}
+  .service-card .examples{
+    margin-top:auto; font-size:.85rem; color:var(--text-dim);
+    background:rgba(255,255,255,.04); border-radius:10px; padding:10px 12px;
+  }
+
+  /* ---------- Diagram ---------- */
+  .diagram{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px; margin:30px 0 10px; flex-wrap:nowrap; overflow-x:auto;
+    padding:10px 4px;
+  }
+  .diagram-step{
+    flex:1; min-width:110px; text-align:center; background:var(--card);
+    border:1px solid var(--border); border-radius:16px; padding:18px 10px;
+  }
+  .diagram-step .emoji{font-size:2rem; display:block; margin-bottom:8px;}
+  .diagram-step .label{font-weight:700; font-size:.85rem;}
+  .diagram-step .sub{font-size:.72rem; color:var(--text-dim); margin-top:4px;}
+  .diagram-arrow{font-size:1.4rem; color:var(--accent2); flex:0 0 auto;}
+  .diagram-caption{font-size:.85rem; color:var(--text-dim); text-align:center; margin-top:6px;}
+  @media (max-width:700px){
+    .diagram{flex-direction:column;}
+    .diagram-arrow{transform:rotate(90deg);}
+  }
+
+  .cable-note{
+    margin-top:24px; background:var(--card-alt); border:1px solid var(--border);
+    border-radius:var(--radius); padding:20px; display:flex; gap:14px; align-items:flex-start;
+  }
+  .cable-note .emoji{font-size:1.8rem;}
+
+  /* ---------- Why it matters ---------- */
+  .benefit-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px; margin-top:24px;
+  }
+  .benefit{
+    background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px;
+  }
+  .benefit .emoji{font-size:1.6rem;}
+  .benefit h4{margin:8px 0 4px; font-size:1rem;}
+  .benefit p{font-size:.9rem; color:var(--text-dim); margin:0;}
+
+  .scenario{
+    margin-top:26px; background:linear-gradient(135deg, rgba(255,93,143,.12), rgba(124,92,255,.12));
+    border:1px solid var(--border); border-radius:var(--radius); padding:22px;
+  }
+  .scenario h3{font-size:1.05rem; color:var(--accent);}
+
+  /* ---------- Security ---------- */
+  .responsibility{
+    display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:24px;
+  }
+  @media (max-width:700px){ .responsibility{grid-template-columns:1fr;} }
+  .resp-card{
+    border-radius:16px; padding:20px; border:1px solid var(--border);
+  }
+  .resp-card.provider{background:rgba(77,217,232,.1); border-color:rgba(77,217,232,.4);}
+  .resp-card.you{background:rgba(255,209,102,.1); border-color:rgba(255,209,102,.4);}
+  .resp-card h4{font-size:.95rem; text-transform:uppercase; letter-spacing:.04em;}
+  .resp-card ul{margin:0; padding-left:18px; font-size:.9rem; color:var(--text-dim);}
+  .resp-card li{margin-bottom:6px;}
+
+  /* ---------- Careers ---------- */
+  .career-list{display:flex; flex-direction:column; gap:14px; margin-top:24px;}
+  .career-row{
+    display:flex; gap:14px; align-items:center; background:var(--card);
+    border:1px solid var(--border); border-radius:14px; padding:16px;
+  }
+  .career-row .emoji{font-size:1.7rem; flex:0 0 auto;}
+  .career-row h4{margin:0 0 2px; font-size:1rem;}
+  .career-row p{margin:0; font-size:.87rem; color:var(--text-dim);}
+  .cta{
+    margin-top:28px; text-align:center; background:linear-gradient(135deg,var(--accent4),var(--accent));
+    border-radius:var(--radius); padding:28px 20px;
+  }
+  .cta h3{font-size:1.3rem; margin-bottom:6px;}
+  .cta p{color:rgba(255,255,255,.85); max-width:60ch; margin:0 auto;}
+
+  /* ---------- Quiz ---------- */
+  .quiz-intro{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    background:var(--card-alt); border:1px solid var(--border); border-radius:14px;
+    padding:14px 16px; margin:22px 0 26px; font-size:.9rem; color:var(--text-dim);
+  }
+  .quiz-progress{
+    font-weight:700; color:var(--accent3); margin-left:auto;
+  }
+  .quiz-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:24px;
+  }
+  .quiz-q{font-size:1.1rem; font-weight:600; margin-bottom:16px;}
+  .quiz-options{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  @media (max-width:560px){ .quiz-options{grid-template-columns:1fr;} }
+  .quiz-btn{
+    cursor:pointer; border:2px solid var(--border); background:var(--bg-alt);
+    color:var(--text); font-family:inherit; font-weight:700; font-size:.95rem;
+    border-radius:12px; padding:14px 10px; transition:.15s; text-align:center;
+  }
+  .quiz-btn:hover{border-color:var(--accent2); transform:translateY(-2px);}
+  .quiz-btn.correct{background:#1f5e3f; border-color:#4ade80; color:#eafff2;}
+  .quiz-btn.wrong{background:#5e2233; border-color:var(--accent); color:#ffe4ec;}
+  .quiz-btn:disabled{cursor:default; transform:none;}
+  .quiz-feedback{
+    margin-top:14px; font-size:.9rem; min-height:1.4em; font-weight:600;
+  }
+  .quiz-feedback.good{color:#4ade80;}
+  .quiz-feedback.bad{color:var(--accent);}
+  .quiz-nav{display:flex; justify-content:space-between; align-items:center; margin-top:18px;}
+  .quiz-next{
+    background:var(--accent2); color:var(--bg); border:none; border-radius:999px;
+    padding:10px 20px; font-weight:800; cursor:pointer; font-size:.9rem;
+    opacity:.4; pointer-events:none; transition:.2s;
+  }
+  .quiz-next.ready{opacity:1; pointer-events:auto;}
+  .quiz-done{
+    text-align:center; padding:20px 0;
+  }
+  .quiz-done .score{font-size:2.4rem; font-family:'Poppins',sans-serif; font-weight:800; color:var(--accent3);}
+  .retry-btn{
+    margin-top:14px; background:var(--accent4); color:#fff; border:none;
+    border-radius:999px; padding:10px 22px; font-weight:700; cursor:pointer;
+  }
+  [hidden]{display:none!important;}
+
+  /* ---------- Footer / back to top ---------- */
+  footer{padding:40px 0 90px; text-align:center; color:var(--text-dim); font-size:.85rem;}
+  #back-to-top{
+    position:fixed; right:18px; bottom:18px; z-index:200;
+    width:48px; height:48px; border-radius:50%;
+    background:var(--accent2); color:var(--bg); border:none;
+    font-size:1.3rem; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.4);
+    opacity:0; pointer-events:none; transition:.25s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #back-to-top.show{opacity:1; pointer-events:auto;}
+
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .badge{
+    font-size:.75rem; font-weight:700; background:var(--card-alt);
+    border:1px solid var(--border); padding:5px 10px; border-radius:999px; color:var(--text-dim);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="dot"></span>Cloud 101</div>
+    <nav class="toc" id="tocNav" aria-label="Section navigation">
+      <a href="#hook">Hook</a>
+      <a href="#what-is-cloud">What is Cloud</a>
+      <a href="#service-layers">Service Layers</a>
+      <a href="#how-it-works">How it Works</a>
+      <a href="#why-it-matters">Why it Matters</a>
+      <a href="#security">Security</a>
+      <a href="#careers">Careers</a>
+      <a href="#quiz">Quiz</a>
+    </nav>
+  </div>
+</div>
+
+<div class="intro-strip">
+  <div class="wrap">
+    <span>📖 <strong>What's this page?</strong> A self-guided tour of cloud computing basics — jump to any section, no set order.</span>
+    <span>⏱️ <strong>~8 min read</strong> + a 2-min quiz at the end.</span>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- 1. HOOK -->
+  <section id="hook" class="hero">
+    <span class="eyebrow">👋 Start here</span>
+    <h1>Where does your Netflix show <em>actually</em> live?</h1>
+    <p class="lede">
+      Seriously — think about it. Your Instagram photos, your Fortnite save file, that essay
+      auto-saving in Google Docs right now. None of it is sitting on your phone. It's all
+      living on someone else's computer, somewhere else on Earth. That's <strong>cloud computing</strong>,
+      and it quietly runs almost everything you do online.
+    </p>
+    <p class="lede">Apps you already use every single day that run on the cloud:</p>
+    <div class="app-grid">
+      <div class="app-chip"><span class="emoji">🎬</span>Netflix</div>
+      <div class="app-chip"><span class="emoji">📸</span>Instagram</div>
+      <div class="app-chip"><span class="emoji">🎮</span>Fortnite</div>
+      <div class="app-chip"><span class="emoji">📄</span>Google Docs</div>
+      <div class="app-chip"><span class="emoji">🎵</span>Spotify</div>
+    </div>
+  </section>
+
+  <!-- 2. WHAT IS CLOUD -->
+  <section id="what-is-cloud">
+    <span class="eyebrow">🌩️ The basics</span>
+    <h2 class="section-title">So what actually <em>is</em> cloud computing?</h2>
+    <p class="lede">
+      Cloud computing means using computer storage, processing power, and software that
+      lives on someone else's servers — accessed over the internet — instead of buying and
+      running your own equipment.
+    </p>
+    <div class="analogy-card">
+      <h3>Think of it like electricity ⚡</h3>
+      <p>
+        You don't own a power station in your backyard. You just plug into the grid and pay
+        for what you use. Cloud computing works the same way, except instead of electricity,
+        you're plugging into storage space and computing power.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. SERVICE LAYERS -->
+  <section id="service-layers">
+    <span class="eyebrow">🧱 Three flavours</span>
+    <h2 class="section-title">SaaS, PaaS, IaaS — the alphabet soup, decoded</h2>
+    <p class="lede">Cloud services come in three main "layers," depending on how much control you get vs. how much the provider handles for you.</p>
+    <div class="card-grid">
+      <div class="service-card">
+        <span class="tag">SaaS</span>
+        <h3>Software as a Service</h3>
+        <p>A finished app you just open and use. No installing, no setup — someone else runs everything behind the scenes.</p>
+        <div class="examples">📌 Examples: Gmail, Netflix, Spotify</div>
+      </div>
+      <div class="service-card">
+        <span class="tag">PaaS</span>
+        <h3>Platform as a Service</h3>
+        <p>A ready-made toolkit developers use to build and launch their own apps, without worrying about the servers underneath.</p>
+        <div class="examples">📌 Examples: Google App Engine, Heroku — the platforms devs build apps on top of</div>
+      </div>
+      <div class="service-card">
+        <span class="tag">IaaS</span>
+        <h3>Infrastructure as a Service</h3>
+        <p>Raw computing power — virtual servers, storage, networking — rented by the hour. You control everything built on top.</p>
+        <div class="examples">📌 Example: Amazon Web Services EC2 — literally renting a computer in a data center</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. HOW IT WORKS -->
+  <section id="how-it-works">
+    <span class="eyebrow">🔌 Under the hood</span>
+    <h2 class="section-title">How does this physically work?</h2>
+    <p class="lede">When you tap "play" on a video, here's the actual journey your request takes:</p>
+    <div class="diagram">
+      <div class="diagram-step"><span class="emoji">📱</span><div class="label">Your device</div><div class="sub">phone, laptop, console</div></div>
+      <div class="diagram-arrow">→</div>
+      <div class="diagram-step"><span class="emoji">🌐</span><div class="label">The internet</div><div class="sub">cables & Wi-Fi</div></div>
+      <div class="diagram-arrow">→</div>
+      <div class="diagram-step"><span class="emoji">🏢</span><div class="label">Data center</div><div class="sub">a real building</div></div>
+      <div class="diagram-arrow">→</div>
+      <div class="diagram-step"><span class="emoji">🖥️</span><div class="label">Servers</div><div class="sub">thousands of computers</div></div>
+    </div>
+    <p class="diagram-caption">Your request travels from your device, across the internet, into a data center, and is handled by physical servers — then the answer travels all the way back.</p>
+
+    <div class="cable-note">
+      <span class="emoji">🏝️</span>
+      <div>
+        <strong>How does Fiji connect to all this?</strong>
+        <p style="margin:6px 0 0;">
+          "The cloud" isn't floating above us — it's real buildings full of humming server
+          racks, usually in places like the US, Australia, or Singapore. Pacific nations like
+          Fiji reach that global infrastructure through <strong>submarine internet cables</strong> —
+          massive fiber-optic cables laid across the ocean floor connecting our islands to the
+          rest of the world's internet backbone.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. WHY IT MATTERS -->
+  <section id="why-it-matters">
+    <span class="eyebrow">💡 The payoff</span>
+    <h2 class="section-title">Okay, but why should I care?</h2>
+    <div class="benefit-grid">
+      <div class="benefit"><span class="emoji">📈</span><h4>Scalability</h4><p>Need more power during a busy sale or viral moment? Scale up instantly, scale back down after.</p></div>
+      <div class="benefit"><span class="emoji">💰</span><h4>Cost savings</h4><p>No need to buy expensive servers upfront — pay only for what you actually use.</p></div>
+      <div class="benefit"><span class="emoji">🌍</span><h4>Access anywhere</h4><p>Your files and apps follow you — log in from any device, anywhere with internet.</p></div>
+      <div class="benefit"><span class="emoji">🤝</span><h4>Collaboration</h4><p>Multiple people editing the same doc or codebase at once, in real time.</p></div>
+    </div>
+    <div class="scenario">
+      <h3>🇫🇯 Real scenario: a small shop in Suva</h3>
+      <p>
+        A local handicraft business wants to sell online. Instead of buying and maintaining
+        its own servers (expensive, and someone has to manage them), it uses cloud-based
+        tools to launch a store in a weekend — payments, hosting, and storage all rented from
+        a cloud provider. It only pays for what it uses, and can handle a flood of orders
+        during tourist season without crashing.
+      </p>
+    </div>
+  </section>
+
+  <!-- 6. SECURITY -->
+  <section id="security">
+    <span class="eyebrow">🔐 Privacy check</span>
+    <h2 class="section-title">Wait — who can actually see my stuff?</h2>
+    <p class="lede">
+      Fair question. Your data on a cloud service is encrypted and access-controlled, but
+      security is a team effort between you and the provider — this is called the
+      <strong>shared responsibility model</strong>.
+    </p>
+    <div class="responsibility">
+      <div class="resp-card provider">
+        <h4>☁️ The provider handles</h4>
+        <ul>
+          <li>Physical security of data centers</li>
+          <li>Keeping servers running & patched</li>
+          <li>Protecting the underlying network</li>
+        </ul>
+      </div>
+      <div class="resp-card you">
+        <h4>🧑 You handle</h4>
+        <ul>
+          <li>Using a strong, unique password</li>
+          <li>Turning on two-factor authentication</li>
+          <li>Not sharing your login with randoms</li>
+        </ul>
+      </div>
+    </div>
+    <p class="lede" style="margin-top:20px;">It's not scary — it's just teamwork. The provider locks the building; you lock your own door.</p>
+  </section>
+
+  <!-- 7. CAREERS -->
+  <section id="careers">
+    <span class="eyebrow">🚀 Where this leads</span>
+    <h2 class="section-title">Could this be a career?</h2>
+    <p class="lede">Cloud skills are some of the most in-demand in tech right now, and you can start exploring them before you even finish high school.</p>
+    <div class="career-list">
+      <div class="career-row"><span class="emoji">☁️</span><div><h4>Cloud Engineer</h4><p>Designs and manages the systems that run on cloud platforms like AWS, Azure, or Google Cloud.</p></div></div>
+      <div class="career-row"><span class="emoji">🔁</span><div><h4>DevOps Engineer</h4><p>Automates how software gets built, tested, and deployed to the cloud, fast and reliably.</p></div></div>
+      <div class="career-row"><span class="emoji">🛡️</span><div><h4>Cloud Security</h4><p>Focuses on keeping cloud systems and data locked down against threats.</p></div></div>
+    </div>
+    <div class="badge-row">
+      <span class="badge">🎓 AWS Cloud Practitioner — entry-level, no degree needed</span>
+      <span class="badge">🎓 Achievable while still in school</span>
+    </div>
+    <div class="cta">
+      <h3>Curious where this could take you?</h3>
+      <p>Studying Computer Science at university is one of the best ways to go deeper into cloud computing, software, and everything in between.</p>
+    </div>
+  </section>
+
+  <!-- 8. QUIZ -->
+  <section id="quiz">
+    <span class="eyebrow">🎮 Quick game</span>
+    <h2 class="section-title">SaaS, PaaS, or IaaS?</h2>
+    <p class="lede">Tap the answer you think is right. No pressure, no scores that matter — just a quick check that it clicked.</p>
+    <div class="quiz-intro">
+      <span>👆 Click any option below to answer instantly</span>
+      <span class="quiz-progress" id="quizProgress">Question 1 / 6</span>
+    </div>
+
+    <div class="quiz-card" id="quizCard">
+      <div class="quiz-q" id="quizQuestion"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <div class="quiz-nav">
+        <span style="font-size:.85rem;color:var(--text-dim);" id="quizScoreLive"></span>
+        <button class="quiz-next" id="quizNextBtn">Next question →</button>
+      </div>
+    </div>
+
+    <div class="quiz-card quiz-done" id="quizDone" hidden>
+      <p style="color:var(--text-dim); margin-bottom:6px;">You scored</p>
+      <div class="score" id="finalScore">0 / 6</div>
+      <p id="finalMsg" style="margin-top:10px;"></p>
+      <button class="retry-btn" id="retryBtn">Play again</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Built for Year 11–13 students exploring cloud computing • Fiji 🇫🇯
+</footer>
+
+<button id="back-to-top" aria-label="Back to top">↑</button>
+
+<script>
+(function(){
+  // ---- Scrollspy ----
+  const navLinks = Array.from(document.querySelectorAll('#tocNav a'));
+  const sections = navLinks.map(a => document.querySelector(a.getAttribute('href')));
+  function setActive(id){
+    navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+  }
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+  sections.forEach(s => s && spy.observe(s));
+
+  // ---- Back to top ----
+  const backBtn = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    backBtn.classList.toggle('show', window.scrollY > 500);
+  });
+  backBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+  // ---- Quiz ----
+  const quizData = [
+    { q: "Gmail — you just log in and use it, no installing anything.", answer: "SaaS" },
+    { q: "Renting a virtual server on AWS EC2 to run whatever you want on it.", answer: "IaaS" },
+    { q: "A platform developers use to build and deploy their own app, without managing servers.", answer: "PaaS" },
+    { q: "Netflix — open the app, stream, done.", answer: "SaaS" },
+    { q: "Renting raw storage and computing power by the hour for your own project.", answer: "IaaS" },
+    { q: "A ready-made environment where coders push their app and it just runs.", answer: "PaaS" },
+  ];
+  const options = ["SaaS", "PaaS", "IaaS"];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  const qEl = document.getElementById('quizQuestion');
+  const optsEl = document.getElementById('quizOptions');
+  const fbEl = document.getElementById('quizFeedback');
+  const progressEl = document.getElementById('quizProgress');
+  const scoreLiveEl = document.getElementById('quizScoreLive');
+  const nextBtn = document.getElementById('quizNextBtn');
+  const quizCard = document.getElementById('quizCard');
+  const quizDone = document.getElementById('quizDone');
+  const finalScoreEl = document.getElementById('finalScore');
+  const finalMsgEl = document.getElementById('finalMsg');
+  const retryBtn = document.getElementById('retryBtn');
+
+  function renderQuestion(){
+    answered = false;
+    nextBtn.classList.remove('ready');
+    fbEl.textContent = '';
+    fbEl.className = 'quiz-feedback';
+    progressEl.textContent = `Question ${current + 1} / ${quizData.length}`;
+    scoreLiveEl.textContent = `Score so far: ${score}`;
+    qEl.textContent = quizData[current].q;
+    optsEl.innerHTML = '';
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-btn';
+      btn.textContent = opt;
+      btn.type = 'button';
+      btn.addEventListener('click', () => handleAnswer(opt, btn));
+      optsEl.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(choice, btnEl){
+    if (answered) return;
+    answered = true;
+    const correct = quizData[current].answer;
+    const allBtns = optsEl.querySelectorAll('.quiz-btn');
+    allBtns.forEach(b => {
+      b.disabled = true;
+      if (b.textContent === correct) b.classList.add('correct');
+    });
+    if (choice === correct){
+      score++;
+      fbEl.textContent = '✅ Nice! That\'s correct.';
+      fbEl.classList.add('good');
+    } else {
+      btnEl.classList.add('wrong');
+      fbEl.textContent = `❌ Not quite — it's ${correct}.`;
+      fbEl.classList.add('bad');
+    }
+    scoreLiveEl.textContent = `Score so far: ${score}`;
+    nextBtn.classList.add('ready');
+    nextBtn.textContent = (current === quizData.length - 1) ? 'See my score →' : 'Next question →';
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (!answered) return;
+    current++;
+    if (current >= quizData.length){
+      showResults();
+    } else {
+      renderQuestion();
+    }
+  });
+
+  function showResults(){
+    quizCard.hidden = true;
+    quizDone.hidden = false;
+    finalScoreEl.textContent = `${score} / ${quizData.length}`;
+    let msg;
+    if (score === quizData.length) msg = "Perfect score! You've got SaaS, PaaS, and IaaS down. 🎉";
+    else if (score >= quizData.length - 2) msg = "Solid! You clearly get the difference.";
+    else msg = "Good effort — scroll back up to Service Layers for a quick recap.";
+    finalMsgEl.textContent = msg;
+  }
+
+  retryBtn.addEventListener('click', () => {
+    current = 0; score = 0;
+    quizDone.hidden = true;
+    quizCard.hidden = false;
+    renderQuestion();
+  });
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
