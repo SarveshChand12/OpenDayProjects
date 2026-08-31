@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cloud Computing 101 — Fiji Edition</title>
-<meta name="description" content="A self-guided intro to cloud computing for Year 11-13 students in Fiji.">
+<title>Networking 101 — Fiji Edition</title>
+<meta name="description" content="A self-guided intro to how networks and the internet actually work, for Year 11-13 students in Fiji.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -160,7 +160,7 @@
     padding:26px; margin-top:22px; position:relative; overflow:hidden;
   }
   .analogy-card::before{
-    content:"⚡"; position:absolute; right:16px; top:10px; font-size:4rem; opacity:.12;
+    content:"🛣️"; position:absolute; right:16px; top:10px; font-size:4rem; opacity:.12;
   }
   .analogy-card h3{color:var(--accent3); font-size:1.1rem;}
 
@@ -405,8 +405,8 @@
   <div class="site-nav-inner">
     <a class="site-brand" href="index.html"><span class="dot"></span>TechEd Fiji</a>
     <nav class="site-links" aria-label="Site pages">
-      <a href="index.html" class="current">☁️ Cloud Computing</a>
-      <a href="networking.html">📡 Networking</a>
+      <a href="index.html">☁️ Cloud Computing</a>
+      <a href="networking.html" class="current">📡 Networking</a>
       <a href="cybersecurity.html">🔐 Cybersecurity</a>
     </nav>
   </div>
@@ -416,21 +416,20 @@
   <div class="topbar-inner">
     <nav class="toc" id="tocNav" aria-label="Section navigation">
       <a href="#hook">Hook</a>
-      <a href="#what-is-cloud">What is Cloud</a>
-      <a href="#service-layers">Service Layers</a>
-      <a href="#how-it-works">How it Works</a>
-      <a href="#why-it-matters">Why it Matters</a>
-      <a href="#security">Security</a>
+      <a href="#what-is-network">What is a Network</a>
+      <a href="#types">Types</a>
+      <a href="#how-data-travels">How Data Travels</a>
+      <a href="#speed-reliability">Speed &amp; Reliability</a>
       <a href="#careers">Careers</a>
-      <a href="#quiz">Quiz</a>
+      <a href="#trace">Trace the Packet</a>
     </nav>
   </div>
 </div>
 
 <div class="intro-strip">
   <div class="wrap">
-    <span>📖 <strong>What's this page?</strong> A self-guided tour of cloud computing basics — jump to any section, no set order.</span>
-    <span>⏱️ <strong>~8 min read</strong> + a 2-min quiz at the end.</span>
+    <span>📖 <strong>What's this page?</strong> A self-guided tour of how networks and the internet actually work — jump to any section, no set order.</span>
+    <span>⏱️ <strong>~7 min read</strong> + a click-through diagram at the end.</span>
   </div>
 </div>
 
@@ -439,197 +438,186 @@
   <!-- 1. HOOK -->
   <section id="hook" class="hero">
     <span class="eyebrow">👋 Start here</span>
-    <h1>Where does your Netflix show <em>actually</em> live?</h1>
+    <h1>How does a message reach your friend's phone in under a second?</h1>
     <p class="lede">
-      Seriously — think about it. Your Instagram photos, your Fortnite save file, that essay
-      auto-saving in Google Docs right now. None of it is sitting on your phone. It's all
-      living on someone else's computer, somewhere else on Earth. That's <strong>cloud computing</strong>,
-      and it quietly runs almost everything you do online.
+      You send a text to a friend on the other side of the world, and it just… arrives.
+      Instantly. No wires you can see, no waiting. That's <strong>networking</strong> — the
+      system of connections that quietly moves your data across the planet, every single
+      time you're online.
     </p>
-    <p class="lede">Apps you already use every single day that run on the cloud:</p>
+    <p class="lede">Everyday things that depend on networking working properly:</p>
     <div class="app-grid">
-      <div class="app-chip"><span class="emoji">🎬</span>Netflix</div>
-      <div class="app-chip"><span class="emoji">📸</span>Instagram</div>
-      <div class="app-chip"><span class="emoji">🎮</span>Fortnite</div>
-      <div class="app-chip"><span class="emoji">📄</span>Google Docs</div>
-      <div class="app-chip"><span class="emoji">🎵</span>Spotify</div>
+      <div class="app-chip"><span class="emoji">📹</span>Video calls</div>
+      <div class="app-chip"><span class="emoji">🎮</span>Online gaming</div>
+      <div class="app-chip"><span class="emoji">💬</span>Group chats</div>
+      <div class="app-chip"><span class="emoji">📡</span>Streaming</div>
     </div>
   </section>
 
-  <!-- 2. WHAT IS CLOUD -->
-  <section id="what-is-cloud">
-    <span class="eyebrow">🌩️ The basics</span>
-    <h2 class="section-title">So what actually <em>is</em> cloud computing?</h2>
+  <!-- 2. WHAT IS A NETWORK -->
+  <section id="what-is-network">
+    <span class="eyebrow">🔗 The basics</span>
+    <h2 class="section-title">So what actually <em>is</em> a network?</h2>
     <p class="lede">
-      Cloud computing means using computer storage, processing power, and software that
-      lives on someone else's servers — accessed over the internet — instead of buying and
-      running your own equipment.
+      A network is just a bunch of devices that can send stuff to each other. That's it —
+      no more complicated than that.
     </p>
     <div class="analogy-card">
-      <h3>Think of it like electricity ⚡</h3>
+      <h3>Think of it like roads connecting cities 🛣️</h3>
       <p>
-        You don't own a power station in your backyard. You just plug into the grid and pay
-        for what you use. Cloud computing works the same way, except instead of electricity,
-        you're plugging into storage space and computing power.
+        Roads let trucks drive between cities to deliver packages. A network is the same
+        idea, except the "roads" are cables and radio signals, the "trucks" are your data,
+        and the "cities" are every device connected to it — your phone, a server, your
+        friend's laptop.
       </p>
     </div>
   </section>
 
-  <!-- 3. SERVICE LAYERS -->
-  <section id="service-layers">
-    <span class="eyebrow">🧱 Three flavours</span>
-    <h2 class="section-title">SaaS, PaaS, IaaS — the alphabet soup, decoded</h2>
-    <p class="lede">Cloud services come in three main "layers," depending on how much control you get vs. how much the provider handles for you.</p>
-    <div class="card-grid">
-      <div class="service-card">
-        <span class="tag">SaaS</span>
-        <h3>Software as a Service</h3>
-        <p>A finished app you just open and use. No installing, no setup — someone else runs everything behind the scenes.</p>
-        <div class="examples">📌 Examples: Gmail, Netflix, Spotify</div>
+  <!-- 3. TYPES OF NETWORKS -->
+  <section id="types">
+    <span class="eyebrow">🧩 Know the difference</span>
+    <h2 class="section-title">LAN, WAN, Wi-Fi, and "the internet" — sorted</h2>
+    <p class="lede">These four words get mixed up constantly. Here's what each one actually means.</p>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tag tag-a">LAN</span>
+        <h3>Local Area Network</h3>
+        <p>Devices connected close together, usually in one building.</p>
+        <div class="examples">📌 Example: your school's Wi-Fi connecting all the classroom computers to each other.</div>
       </div>
-      <div class="service-card">
-        <span class="tag">PaaS</span>
-        <h3>Platform as a Service</h3>
-        <p>A ready-made toolkit developers use to build and launch their own apps, without worrying about the servers underneath.</p>
-        <div class="examples">📌 Examples: Google App Engine, Heroku — the platforms devs build apps on top of</div>
+      <div class="type-card">
+        <span class="tag tag-b">WAN</span>
+        <h3>Wide Area Network</h3>
+        <p>Networks connected across huge distances — even between countries.</p>
+        <div class="examples">📌 Example: the internet itself is the biggest WAN there is.</div>
       </div>
-      <div class="service-card">
-        <span class="tag">IaaS</span>
-        <h3>Infrastructure as a Service</h3>
-        <p>Raw computing power — virtual servers, storage, networking — rented by the hour. You control everything built on top.</p>
-        <div class="examples">📌 Example: Amazon Web Services EC2 — literally renting a computer in a data center</div>
+      <div class="type-card">
+        <span class="tag tag-c">Wi-Fi</span>
+        <h3>Just how you connect</h3>
+        <p>Wi-Fi is how your device joins a network wirelessly — it's the "last few metres," not the whole internet.</p>
+        <div class="examples">📌 Example: your phone uses home Wi-Fi, but that Wi-Fi still needs its own internet connection to reach anything outside your house.</div>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-d">Internet</span>
+        <h3>The network of networks</h3>
+        <p>The giant global network connecting everyone together. Wi-Fi is just your on-ramp to it.</p>
+        <div class="examples">📌 Example: watching YouTube uses your Wi-Fi to reach the internet, then the internet to reach YouTube's servers.</div>
       </div>
     </div>
   </section>
 
-  <!-- 4. HOW IT WORKS -->
-  <section id="how-it-works">
-    <span class="eyebrow">🔌 Under the hood</span>
-    <h2 class="section-title">How does this physically work?</h2>
-    <p class="lede">When you tap "play" on a video, here's the actual journey your request takes:</p>
-    <div class="diagram">
-      <div class="diagram-step"><span class="emoji">📱</span><div class="label">Your device</div><div class="sub">phone, laptop, console</div></div>
-      <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">🌐</span><div class="label">The internet</div><div class="sub">cables & Wi-Fi</div></div>
-      <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">🏢</span><div class="label">Data center</div><div class="sub">a real building</div></div>
-      <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">🖥️</span><div class="label">Servers</div><div class="sub">thousands of computers</div></div>
+  <!-- 4. HOW DATA TRAVELS -->
+  <section id="how-data-travels">
+    <span class="eyebrow">📦 Under the hood</span>
+    <h2 class="section-title">How does data actually travel?</h2>
+    <p class="lede">
+      Sending a message isn't one smooth beam of data — it's more like a delivery
+      service breaking your package into smaller boxes and routing each one separately.
+    </p>
+    <div class="card-grid">
+      <div class="service-card">
+        <span class="tag">Packets</span>
+        <h3>Small chunks of data</h3>
+        <p>Your message gets chopped into small pieces called packets, each sent separately and reassembled at the other end.</p>
+        <div class="examples">📌 Like splitting one big parcel into several smaller boxes so they're easier to send.</div>
+      </div>
+      <div class="service-card">
+        <span class="tag">IP address</span>
+        <h3>Every device's address</h3>
+        <p>Every device online has a unique address, so packets know exactly where they're headed.</p>
+        <div class="examples">📌 Like a street address, but for a phone, laptop, or server.</div>
+      </div>
+      <div class="service-card">
+        <span class="tag">Routers</span>
+        <h3>Traffic directors</h3>
+        <p>Routers read those addresses and forward each packet toward its destination, one hop at a time.</p>
+        <div class="examples">📌 Like a series of roundabouts, each pointing your packet the right way.</div>
+      </div>
     </div>
-    <p class="diagram-caption">Your request travels from your device, across the internet, into a data center, and is handled by physical servers — then the answer travels all the way back.</p>
+
+    <p class="lede" style="margin-top:34px;">Put together, here's the whole trip a message takes:</p>
+    <div class="diagram">
+      <div class="diagram-step"><span class="emoji">✉️</span><div class="label">Message</div><div class="sub">what you typed</div></div>
+      <div class="diagram-arrow">→</div>
+      <div class="diagram-step"><span class="emoji">📦</span><div class="label">Packets</div><div class="sub">chopped into pieces</div></div>
+      <div class="diagram-arrow">→</div>
+      <div class="diagram-step"><span class="emoji">🌐</span><div class="label">Routed</div><div class="sub">across the internet</div></div>
+      <div class="diagram-arrow">→</div>
+      <div class="diagram-step"><span class="emoji">✅</span><div class="label">Reassembled</div><div class="sub">back into your message</div></div>
+    </div>
+    <p class="diagram-caption">This all happens in milliseconds — for every message, video call, and game move you send.</p>
 
     <div class="cable-note">
       <span class="emoji">🏝️</span>
       <div>
-        <strong>How does Fiji connect to all this?</strong>
+        <strong>Remember the submarine cables from the Cloud Computing page?</strong>
         <p style="margin:6px 0 0;">
-          "The cloud" isn't floating above us — it's real buildings full of humming server
-          racks, usually in places like the US, Australia, or Singapore. Pacific nations like
-          Fiji reach that global infrastructure through <strong>submarine internet cables</strong> —
-          massive fiber-optic cables laid across the ocean floor connecting our islands to the
-          rest of the world's internet backbone.
+          This is exactly where they matter. When your packets need to cross an ocean —
+          say, from Fiji to a server in Australia or the US — they physically travel
+          through <strong>submarine internet cables</strong>: fibre-optic cables laid across
+          the ocean floor. There's no wireless shortcut for that distance; it's real cable,
+          the whole way. <a href="index.html#how-it-works">See it on the Cloud Computing page →</a>
         </p>
       </div>
     </div>
   </section>
 
-  <!-- 5. WHY IT MATTERS -->
-  <section id="why-it-matters">
-    <span class="eyebrow">💡 The payoff</span>
-    <h2 class="section-title">Okay, but why should I care?</h2>
+  <!-- 5. SPEED & RELIABILITY -->
+  <section id="speed-reliability">
+    <span class="eyebrow">⚡ Why it matters</span>
+    <h2 class="section-title">Why speed and reliability actually matter</h2>
+    <p class="lede">You've felt bad networking before, even if you didn't call it that.</p>
     <div class="benefit-grid">
-      <div class="benefit"><span class="emoji">📈</span><h4>Scalability</h4><p>Need more power during a busy sale or viral moment? Scale up instantly, scale back down after.</p></div>
-      <div class="benefit"><span class="emoji">💰</span><h4>Cost savings</h4><p>No need to buy expensive servers upfront — pay only for what you actually use.</p></div>
-      <div class="benefit"><span class="emoji">🌍</span><h4>Access anywhere</h4><p>Your files and apps follow you — log in from any device, anywhere with internet.</p></div>
-      <div class="benefit"><span class="emoji">🤝</span><h4>Collaboration</h4><p>Multiple people editing the same doc or codebase at once, in real time.</p></div>
+      <div class="benefit"><span class="emoji">🎮</span><h4>Gaming lag</h4><p>High latency means there's a delay between you pressing a button and it actually happening on screen.</p></div>
+      <div class="benefit"><span class="emoji">📹</span><h4>Video call freezing</h4><p>When packets arrive late or get lost, your call stutters or freezes until they catch up.</p></div>
+      <div class="benefit"><span class="emoji">⏳</span><h4>Buffering</h4><p>Your device is pausing playback while it waits for more packets to arrive.</p></div>
+      <div class="benefit"><span class="emoji">📶</span><h4>Reliability</h4><p>A stable connection means packets consistently arrive on time, without dropping out.</p></div>
     </div>
     <div class="scenario">
-      <h3>🇫🇯 Real scenario: a small shop in Suva</h3>
+      <h3>🇫🇯 Why this hits differently in the Pacific</h3>
       <p>
-        A local handicraft business wants to sell online. Instead of buying and maintaining
-        its own servers (expensive, and someone has to manage them), it uses cloud-based
-        tools to launch a store in a weekend — payments, hosting, and storage all rented from
-        a cloud provider. It only pays for what it uses, and can handle a flood of orders
-        during tourist season without crashing.
+        Fiji and other Pacific Island nations are physically far from the world's major
+        internet hubs, and often connect through a smaller number of submarine cable routes
+        than bigger countries. That greater distance can mean higher latency, and fewer
+        backup routes can mean bigger disruptions if a cable gets damaged. It's a big reason
+        why investing in more cable connections matters so much for the region.
       </p>
     </div>
   </section>
 
-  <!-- 6. SECURITY -->
-  <section id="security">
-    <span class="eyebrow">🔐 Privacy check</span>
-    <h2 class="section-title">Wait — who can actually see my stuff?</h2>
-    <p class="lede">
-      Fair question. Your data on a cloud service is encrypted and access-controlled, but
-      security is a team effort between you and the provider — this is called the
-      <strong>shared responsibility model</strong>.
-    </p>
-    <div class="responsibility">
-      <div class="resp-card provider">
-        <h4>☁️ The provider handles</h4>
-        <ul>
-          <li>Physical security of data centers</li>
-          <li>Keeping servers running & patched</li>
-          <li>Protecting the underlying network</li>
-        </ul>
-      </div>
-      <div class="resp-card you">
-        <h4>🧑 You handle</h4>
-        <ul>
-          <li>Using a strong, unique password</li>
-          <li>Turning on two-factor authentication</li>
-          <li>Not sharing your login with randoms</li>
-        </ul>
-      </div>
-    </div>
-    <p class="lede" style="margin-top:20px;">It's not scary — it's just teamwork. The provider locks the building; you lock your own door.</p>
-  </section>
-
-  <!-- 7. CAREERS -->
+  <!-- 6. CAREERS -->
   <section id="careers">
     <span class="eyebrow">🚀 Where this leads</span>
     <h2 class="section-title">Could this be a career?</h2>
-    <p class="lede">Cloud skills are some of the most in-demand in tech right now, and you can start exploring them before you even finish high school.</p>
+    <p class="lede">Every app, game, and business depends on networks working — someone has to build and run them.</p>
     <div class="career-list">
-      <div class="career-row"><span class="emoji">☁️</span><div><h4>Cloud Engineer</h4><p>Designs and manages the systems that run on cloud platforms like AWS, Azure, or Google Cloud.</p></div></div>
-      <div class="career-row"><span class="emoji">🔁</span><div><h4>DevOps Engineer</h4><p>Automates how software gets built, tested, and deployed to the cloud, fast and reliably.</p></div></div>
-      <div class="career-row"><span class="emoji">🛡️</span><div><h4>Cloud Security</h4><p>Focuses on keeping cloud systems and data locked down against threats.</p></div></div>
+      <div class="career-row"><span class="emoji">📡</span><div><h4>Network Engineer</h4><p>Designs and builds the networks that keep everything connected, from school Wi-Fi to national infrastructure.</p></div></div>
+      <div class="career-row"><span class="emoji">🛠️</span><div><h4>Network Administrator</h4><p>Keeps existing networks running smoothly day to day, fixing issues before they become outages.</p></div></div>
+      <div class="career-row"><span class="emoji">📞</span><div><h4>Telecom / ISP roles</h4><p>The people and companies who build and maintain the infrastructure connecting Fiji to the rest of the world.</p></div></div>
     </div>
     <div class="badge-row">
-      <span class="badge">🎓 AWS Cloud Practitioner — entry-level, no degree needed</span>
+      <span class="badge">🎓 CompTIA Network+ — entry-level, no degree needed</span>
       <span class="badge">🎓 Achievable while still in school</span>
     </div>
     <div class="cta">
       <h3>Curious where this could take you?</h3>
-      <p>Studying Computer Science at university is one of the best ways to go deeper into cloud computing, software, and everything in between.</p>
+      <p>Studying Computer Science at university is one of the best ways to go deeper into networking, systems, and everything in between.</p>
     </div>
   </section>
 
-  <!-- 8. QUIZ -->
-  <section id="quiz">
-    <span class="eyebrow">🎮 Quick game</span>
-    <h2 class="section-title">SaaS, PaaS, or IaaS?</h2>
-    <p class="lede">Tap the answer you think is right. No pressure, no scores that matter — just a quick check that it clicked.</p>
-    <div class="quiz-intro">
-      <span>👆 Click any option below to answer instantly</span>
-      <span class="quiz-progress" id="quizProgress">Question 1 / 6</span>
+  <!-- 7. TRACE THE PACKET (INTERACTIVE) -->
+  <section id="trace">
+    <span class="eyebrow">🕹️ Try it yourself</span>
+    <h2 class="section-title">Trace the packet</h2>
+    <p class="lede">Follow a single message as it leaves your phone and lands on your friend's, right on the other side of the planet.</p>
+    <div class="trace-hint">
+      <span>👆 Tap any stop below to see what happens there</span>
     </div>
-
-    <div class="quiz-card" id="quizCard">
-      <div class="quiz-q" id="quizQuestion"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-feedback" id="quizFeedback"></div>
-      <div class="quiz-nav">
-        <span style="font-size:.85rem;color:var(--text-dim);" id="quizScoreLive"></span>
-        <button class="quiz-next" id="quizNextBtn">Next question →</button>
-      </div>
-    </div>
-
-    <div class="quiz-card quiz-done" id="quizDone" hidden>
-      <p style="color:var(--text-dim); margin-bottom:6px;">You scored</p>
-      <div class="score" id="finalScore">0 / 6</div>
-      <p id="finalMsg" style="margin-top:10px;"></p>
-      <button class="retry-btn" id="retryBtn">Play again</button>
+    <div class="trace-track" id="traceTrack"></div>
+    <div class="trace-panel" id="tracePanel">
+      <span class="trace-step-num" id="traceStepNum">Stop 1 of 7</span>
+      <h3 id="traceTitle"></h3>
+      <p id="traceDesc"></p>
     </div>
   </section>
 
@@ -638,9 +626,9 @@
 <div class="cross-promo">
   <h3>Keep exploring the site</h3>
   <div class="cross-grid">
-    <a class="cross-card" href="networking.html">
-      <span class="emoji">📡</span>
-      <div><h4>Curious how networks move your data?</h4><p>Check out Networking →</p></div>
+    <a class="cross-card" href="index.html">
+      <span class="emoji">☁️</span>
+      <div><h4>Wondering where your data actually lives?</h4><p>Check out Cloud Computing →</p></div>
     </a>
     <a class="cross-card" href="cybersecurity.html">
       <span class="emoji">🔐</span>
@@ -650,7 +638,7 @@
 </div>
 
 <footer>
-  Built for Year 11–13 students exploring cloud computing • Fiji 🇫🇯
+  Built for Year 11–13 students exploring networking • Fiji 🇫🇯
 </footer>
 
 <button id="back-to-top" aria-label="Back to top">↑</button>
@@ -689,104 +677,46 @@
   });
   backBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
 
-  // ---- Quiz ----
-  const quizData = [
-    { q: "Gmail — you just log in and use it, no installing anything.", answer: "SaaS" },
-    { q: "Renting a virtual server on AWS EC2 to run whatever you want on it.", answer: "IaaS" },
-    { q: "A platform developers use to build and deploy their own app, without managing servers.", answer: "PaaS" },
-    { q: "Netflix — open the app, stream, done.", answer: "SaaS" },
-    { q: "Renting raw storage and computing power by the hour for your own project.", answer: "IaaS" },
-    { q: "A ready-made environment where coders push their app and it just runs.", answer: "PaaS" },
+  // ---- Trace the packet ----
+  const traceData = [
+    { emoji: "📱", label: "Your device", title: "It starts on your phone", desc: "You hit send. Your message is just text and data sitting on your device, about to start its trip." },
+    { emoji: "📦", label: "Packets", title: "Chopped into packets", desc: "Your message is broken into small chunks called packets, each labeled with where it's headed." },
+    { emoji: "📶", label: "Wi-Fi / router", title: "Out through Wi-Fi or mobile data", desc: "The packets leave your device over Wi-Fi or mobile data and reach your local router first." },
+    { emoji: "🏢", label: "ISP", title: "Handed to your internet provider", desc: "Your internet service provider (ISP) picks up the packets and routes them toward the internet at large." },
+    { emoji: "🌊", label: "Submarine cable", title: "Crossing the ocean", desc: "If your message is heading overseas, it now travels through a submarine fibre-optic cable running along the ocean floor, connecting Fiji to the rest of the world." },
+    { emoji: "🌐", label: "Internet backbone", title: "Hopping across routers", desc: "Along the way, multiple routers pass the packets along, each one choosing the fastest available path, hop by hop." },
+    { emoji: "📲", label: "Friend's device", title: "Reassembled and delivered", desc: "The packets arrive and get reassembled back into your original message — all in well under a second." },
   ];
-  const options = ["SaaS", "PaaS", "IaaS"];
 
-  let current = 0;
-  let score = 0;
-  let answered = false;
+  const trackEl = document.getElementById('traceTrack');
+  const stepNumEl = document.getElementById('traceStepNum');
+  const titleEl = document.getElementById('traceTitle');
+  const descEl = document.getElementById('traceDesc');
+  let activeIndex = 0;
 
-  const qEl = document.getElementById('quizQuestion');
-  const optsEl = document.getElementById('quizOptions');
-  const fbEl = document.getElementById('quizFeedback');
-  const progressEl = document.getElementById('quizProgress');
-  const scoreLiveEl = document.getElementById('quizScoreLive');
-  const nextBtn = document.getElementById('quizNextBtn');
-  const quizCard = document.getElementById('quizCard');
-  const quizDone = document.getElementById('quizDone');
-  const finalScoreEl = document.getElementById('finalScore');
-  const finalMsgEl = document.getElementById('finalMsg');
-  const retryBtn = document.getElementById('retryBtn');
-
-  function renderQuestion(){
-    answered = false;
-    nextBtn.classList.remove('ready');
-    fbEl.textContent = '';
-    fbEl.className = 'quiz-feedback';
-    progressEl.textContent = `Question ${current + 1} / ${quizData.length}`;
-    scoreLiveEl.textContent = `Score so far: ${score}`;
-    qEl.textContent = quizData[current].q;
-    optsEl.innerHTML = '';
-    options.forEach(opt => {
+  function renderTrack(){
+    trackEl.innerHTML = '';
+    traceData.forEach((stop, i) => {
       const btn = document.createElement('button');
-      btn.className = 'quiz-btn';
-      btn.textContent = opt;
+      btn.className = 'trace-stop' + (i === activeIndex ? ' active' : '');
       btn.type = 'button';
-      btn.addEventListener('click', () => handleAnswer(opt, btn));
-      optsEl.appendChild(btn);
+      btn.innerHTML = `<span class="emoji">${stop.emoji}</span><span class="label">${stop.label}</span>`;
+      btn.addEventListener('click', () => selectStop(i));
+      trackEl.appendChild(btn);
     });
   }
 
-  function handleAnswer(choice, btnEl){
-    if (answered) return;
-    answered = true;
-    const correct = quizData[current].answer;
-    const allBtns = optsEl.querySelectorAll('.quiz-btn');
-    allBtns.forEach(b => {
-      b.disabled = true;
-      if (b.textContent === correct) b.classList.add('correct');
-    });
-    if (choice === correct){
-      score++;
-      fbEl.textContent = '✅ Nice! That\'s correct.';
-      fbEl.classList.add('good');
-    } else {
-      btnEl.classList.add('wrong');
-      fbEl.textContent = `❌ Not quite — it's ${correct}.`;
-      fbEl.classList.add('bad');
-    }
-    scoreLiveEl.textContent = `Score so far: ${score}`;
-    nextBtn.classList.add('ready');
-    nextBtn.textContent = (current === quizData.length - 1) ? 'See my score →' : 'Next question →';
+  function selectStop(i){
+    activeIndex = i;
+    renderTrack();
+    const stop = traceData[i];
+    stepNumEl.textContent = `Stop ${i + 1} of ${traceData.length}`;
+    titleEl.textContent = `${stop.emoji} ${stop.title}`;
+    descEl.textContent = stop.desc;
   }
 
-  nextBtn.addEventListener('click', () => {
-    if (!answered) return;
-    current++;
-    if (current >= quizData.length){
-      showResults();
-    } else {
-      renderQuestion();
-    }
-  });
-
-  function showResults(){
-    quizCard.hidden = true;
-    quizDone.hidden = false;
-    finalScoreEl.textContent = `${score} / ${quizData.length}`;
-    let msg;
-    if (score === quizData.length) msg = "Perfect score! You've got SaaS, PaaS, and IaaS down. 🎉";
-    else if (score >= quizData.length - 2) msg = "Solid! You clearly get the difference.";
-    else msg = "Good effort — scroll back up to Service Layers for a quick recap.";
-    finalMsgEl.textContent = msg;
-  }
-
-  retryBtn.addEventListener('click', () => {
-    current = 0; score = 0;
-    quizDone.hidden = true;
-    quizCard.hidden = false;
-    renderQuestion();
-  });
-
-  renderQuestion();
+  renderTrack();
+  selectStop(0);
 })();
 </script>
 </body>

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cloud Computing 101 — Fiji Edition</title>
-<meta name="description" content="A self-guided intro to cloud computing for Year 11-13 students in Fiji.">
+<title>Cybersecurity 101 — Fiji Edition</title>
+<meta name="description" content="A self-guided intro to staying safe online, for Year 11-13 students in Fiji.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -160,7 +160,7 @@
     padding:26px; margin-top:22px; position:relative; overflow:hidden;
   }
   .analogy-card::before{
-    content:"⚡"; position:absolute; right:16px; top:10px; font-size:4rem; opacity:.12;
+    content:"🔒"; position:absolute; right:16px; top:10px; font-size:4rem; opacity:.12;
   }
   .analogy-card h3{color:var(--accent3); font-size:1.1rem;}
 
@@ -405,9 +405,9 @@
   <div class="site-nav-inner">
     <a class="site-brand" href="index.html"><span class="dot"></span>TechEd Fiji</a>
     <nav class="site-links" aria-label="Site pages">
-      <a href="index.html" class="current">☁️ Cloud Computing</a>
+      <a href="index.html">☁️ Cloud Computing</a>
       <a href="networking.html">📡 Networking</a>
-      <a href="cybersecurity.html">🔐 Cybersecurity</a>
+      <a href="cybersecurity.html" class="current">🔐 Cybersecurity</a>
     </nav>
   </div>
 </div>
@@ -416,11 +416,10 @@
   <div class="topbar-inner">
     <nav class="toc" id="tocNav" aria-label="Section navigation">
       <a href="#hook">Hook</a>
-      <a href="#what-is-cloud">What is Cloud</a>
-      <a href="#service-layers">Service Layers</a>
-      <a href="#how-it-works">How it Works</a>
-      <a href="#why-it-matters">Why it Matters</a>
-      <a href="#security">Security</a>
+      <a href="#what-is-cybersecurity">What is Cybersecurity</a>
+      <a href="#threats">Threats</a>
+      <a href="#how-attacks-happen">How Attacks Happen</a>
+      <a href="#protect-yourself">Protect Yourself</a>
       <a href="#careers">Careers</a>
       <a href="#quiz">Quiz</a>
     </nav>
@@ -429,8 +428,8 @@
 
 <div class="intro-strip">
   <div class="wrap">
-    <span>📖 <strong>What's this page?</strong> A self-guided tour of cloud computing basics — jump to any section, no set order.</span>
-    <span>⏱️ <strong>~8 min read</strong> + a 2-min quiz at the end.</span>
+    <span>📖 <strong>What's this page?</strong> A self-guided tour of how to stay safe online — jump to any section, no set order.</span>
+    <span>⏱️ <strong>~7 min read</strong> + a 2-min game at the end.</span>
   </div>
 </div>
 
@@ -439,176 +438,132 @@
   <!-- 1. HOOK -->
   <section id="hook" class="hero">
     <span class="eyebrow">👋 Start here</span>
-    <h1>Where does your Netflix show <em>actually</em> live?</h1>
+    <h1>Would you notice if someone was quietly reading your messages right now?</h1>
     <p class="lede">
-      Seriously — think about it. Your Instagram photos, your Fortnite save file, that essay
-      auto-saving in Google Docs right now. None of it is sitting on your phone. It's all
-      living on someone else's computer, somewhere else on Earth. That's <strong>cloud computing</strong>,
-      and it quietly runs almost everything you do online.
+      Most people wouldn't. Getting hacked rarely looks dramatic — it usually looks like a
+      normal-seeming message you almost didn't think twice about. <strong>Cybersecurity</strong>
+      is about closing those gaps before someone else finds them.
     </p>
-    <p class="lede">Apps you already use every single day that run on the cloud:</p>
+    <p class="lede">Scenarios you've probably already come across:</p>
     <div class="app-grid">
-      <div class="app-chip"><span class="emoji">🎬</span>Netflix</div>
-      <div class="app-chip"><span class="emoji">📸</span>Instagram</div>
-      <div class="app-chip"><span class="emoji">🎮</span>Fortnite</div>
-      <div class="app-chip"><span class="emoji">📄</span>Google Docs</div>
-      <div class="app-chip"><span class="emoji">🎵</span>Spotify</div>
+      <div class="app-chip"><span class="emoji">🎣</span>A fake login page</div>
+      <div class="app-chip"><span class="emoji">🎁</span>"Free Robux/skins" link</div>
+      <div class="app-chip"><span class="emoji">🔓</span>A hacked Instagram account</div>
     </div>
   </section>
 
-  <!-- 2. WHAT IS CLOUD -->
-  <section id="what-is-cloud">
-    <span class="eyebrow">🌩️ The basics</span>
-    <h2 class="section-title">So what actually <em>is</em> cloud computing?</h2>
+  <!-- 2. WHAT IS CYBERSECURITY -->
+  <section id="what-is-cybersecurity">
+    <span class="eyebrow">🛡️ The basics</span>
+    <h2 class="section-title">So what actually <em>is</em> cybersecurity?</h2>
     <p class="lede">
-      Cloud computing means using computer storage, processing power, and software that
-      lives on someone else's servers — accessed over the internet — instead of buying and
-      running your own equipment.
+      Cybersecurity is the practice of protecting your accounts, devices, and data from
+      people who want to access them without permission.
     </p>
     <div class="analogy-card">
-      <h3>Think of it like electricity ⚡</h3>
+      <h3>Think of it like locks on your doors and windows 🔒</h3>
       <p>
-        You don't own a power station in your backyard. You just plug into the grid and pay
-        for what you use. Cloud computing works the same way, except instead of electricity,
-        you're plugging into storage space and computing power.
+        You lock your front door so strangers can't just walk in. Cybersecurity is protecting
+        your digital stuff the same way — except the doors are your accounts, and the windows
+        are your devices.
       </p>
     </div>
   </section>
 
-  <!-- 3. SERVICE LAYERS -->
-  <section id="service-layers">
-    <span class="eyebrow">🧱 Three flavours</span>
-    <h2 class="section-title">SaaS, PaaS, IaaS — the alphabet soup, decoded</h2>
-    <p class="lede">Cloud services come in three main "layers," depending on how much control you get vs. how much the provider handles for you.</p>
+  <!-- 3. THREATS -->
+  <section id="threats">
+    <span class="eyebrow">⚠️ Know the enemy</span>
+    <h2 class="section-title">Common threats, explained simply</h2>
+    <p class="lede">These aren't just corporate IT problems — they show up in your DMs and downloads too.</p>
     <div class="card-grid">
       <div class="service-card">
-        <span class="tag">SaaS</span>
-        <h3>Software as a Service</h3>
-        <p>A finished app you just open and use. No installing, no setup — someone else runs everything behind the scenes.</p>
-        <div class="examples">📌 Examples: Gmail, Netflix, Spotify</div>
+        <span class="tag">Phishing</span>
+        <h3>Fake messages that trick you</h3>
+        <p>A message pretending to be from someone or something you trust, trying to get you to click a bad link or hand over info.</p>
+        <div class="examples">📌 Example: a DM saying "omg is this you in this video?? 😳 [link]" from a friend's hacked account.</div>
       </div>
       <div class="service-card">
-        <span class="tag">PaaS</span>
-        <h3>Platform as a Service</h3>
-        <p>A ready-made toolkit developers use to build and launch their own apps, without worrying about the servers underneath.</p>
-        <div class="examples">📌 Examples: Google App Engine, Heroku — the platforms devs build apps on top of</div>
+        <span class="tag">Malware</span>
+        <h3>Software that spies or damages</h3>
+        <p>Malicious software that sneaks onto your device to steal data, spy on you, or cause damage.</p>
+        <div class="examples">📌 Example: a "free Fortnite skins" download that's actually a virus in disguise.</div>
       </div>
       <div class="service-card">
-        <span class="tag">IaaS</span>
-        <h3>Infrastructure as a Service</h3>
-        <p>Raw computing power — virtual servers, storage, networking — rented by the hour. You control everything built on top.</p>
-        <div class="examples">📌 Example: Amazon Web Services EC2 — literally renting a computer in a data center</div>
+        <span class="tag">Passwords</span>
+        <h3>Weak or reused passwords</h3>
+        <p>Using simple or repeated passwords across apps — so if one leaks, every account using it is now at risk.</p>
+        <div class="examples">📌 Example: using the same password for Instagram, TikTok, and your school email.</div>
       </div>
     </div>
   </section>
 
-  <!-- 4. HOW IT WORKS -->
-  <section id="how-it-works">
-    <span class="eyebrow">🔌 Under the hood</span>
-    <h2 class="section-title">How does this physically work?</h2>
-    <p class="lede">When you tap "play" on a video, here's the actual journey your request takes:</p>
+  <!-- 4. HOW ATTACKS HAPPEN -->
+  <section id="how-attacks-happen">
+    <span class="eyebrow">🔍 Step by step</span>
+    <h2 class="section-title">How does an attack actually happen?</h2>
+    <p class="lede">Here's how a typical phishing scam plays out, start to finish:</p>
     <div class="diagram">
-      <div class="diagram-step"><span class="emoji">📱</span><div class="label">Your device</div><div class="sub">phone, laptop, console</div></div>
+      <div class="diagram-step"><span class="emoji">📩</span><div class="label">Fake message</div><div class="sub">looks like it's from someone real</div></div>
       <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">🌐</span><div class="label">The internet</div><div class="sub">cables & Wi-Fi</div></div>
+      <div class="diagram-step"><span class="emoji">🔗</span><div class="label">Fake link</div><div class="sub">urgent, tempting, or scary</div></div>
       <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">🏢</span><div class="label">Data center</div><div class="sub">a real building</div></div>
+      <div class="diagram-step"><span class="emoji">🖥️</span><div class="label">Fake login page</div><div class="sub">looks almost identical to the real one</div></div>
       <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">🖥️</span><div class="label">Servers</div><div class="sub">thousands of computers</div></div>
+      <div class="diagram-step"><span class="emoji">🔓</span><div class="label">Stolen password</div><div class="sub">now in the attacker's hands</div></div>
     </div>
-    <p class="diagram-caption">Your request travels from your device, across the internet, into a data center, and is handled by physical servers — then the answer travels all the way back.</p>
+    <p class="diagram-caption">One click on the wrong link is often all it takes.</p>
 
     <div class="cable-note">
-      <span class="emoji">🏝️</span>
+      <span class="emoji">🧠</span>
       <div>
-        <strong>How does Fiji connect to all this?</strong>
+        <strong>The real trick: it's not your computer being hacked, it's you</strong>
         <p style="margin:6px 0 0;">
-          "The cloud" isn't floating above us — it's real buildings full of humming server
-          racks, usually in places like the US, Australia, or Singapore. Pacific nations like
-          Fiji reach that global infrastructure through <strong>submarine internet cables</strong> —
-          massive fiber-optic cables laid across the ocean floor connecting our islands to the
-          rest of the world's internet backbone.
+          Most attacks don't break through some technical wall — they trick a person into
+          opening the door themselves. This is called <strong>social engineering</strong>:
+          using urgency, curiosity, or trust to get you to act without thinking it through.
+          That's exactly why staying alert matters more than any piece of software.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- 5. WHY IT MATTERS -->
-  <section id="why-it-matters">
-    <span class="eyebrow">💡 The payoff</span>
-    <h2 class="section-title">Okay, but why should I care?</h2>
+  <!-- 5. PROTECT YOURSELF -->
+  <section id="protect-yourself">
+    <span class="eyebrow">✅ Take action</span>
+    <h2 class="section-title">How to actually protect yourself</h2>
+    <p class="lede">Simple habits, not paranoia. Here's what actually makes a difference:</p>
     <div class="benefit-grid">
-      <div class="benefit"><span class="emoji">📈</span><h4>Scalability</h4><p>Need more power during a busy sale or viral moment? Scale up instantly, scale back down after.</p></div>
-      <div class="benefit"><span class="emoji">💰</span><h4>Cost savings</h4><p>No need to buy expensive servers upfront — pay only for what you actually use.</p></div>
-      <div class="benefit"><span class="emoji">🌍</span><h4>Access anywhere</h4><p>Your files and apps follow you — log in from any device, anywhere with internet.</p></div>
-      <div class="benefit"><span class="emoji">🤝</span><h4>Collaboration</h4><p>Multiple people editing the same doc or codebase at once, in real time.</p></div>
-    </div>
-    <div class="scenario">
-      <h3>🇫🇯 Real scenario: a small shop in Suva</h3>
-      <p>
-        A local handicraft business wants to sell online. Instead of buying and maintaining
-        its own servers (expensive, and someone has to manage them), it uses cloud-based
-        tools to launch a store in a weekend — payments, hosting, and storage all rented from
-        a cloud provider. It only pays for what it uses, and can handle a flood of orders
-        during tourist season without crashing.
-      </p>
+      <div class="benefit"><span class="emoji">🔑</span><h4>Strong, unique passwords</h4><p>A different password for every account, so one leak doesn't take down everything you own.</p></div>
+      <div class="benefit"><span class="emoji">📲</span><h4>Turn on 2FA</h4><p>Adds a second step, like a code sent to your phone, so a stolen password alone isn't enough to get in.</p></div>
+      <div class="benefit"><span class="emoji">🧐</span><h4>Spot suspicious links</h4><p>Long-press or hover to check where a link actually goes — weird spelling or extra words in the domain are red flags.</p></div>
+      <div class="benefit"><span class="emoji">🚫</span><h4>Never reuse passwords</h4><p>Use a password manager if remembering unique ones is hard — way easier than dealing with a hacked account.</p></div>
     </div>
   </section>
 
-  <!-- 6. SECURITY -->
-  <section id="security">
-    <span class="eyebrow">🔐 Privacy check</span>
-    <h2 class="section-title">Wait — who can actually see my stuff?</h2>
-    <p class="lede">
-      Fair question. Your data on a cloud service is encrypted and access-controlled, but
-      security is a team effort between you and the provider — this is called the
-      <strong>shared responsibility model</strong>.
-    </p>
-    <div class="responsibility">
-      <div class="resp-card provider">
-        <h4>☁️ The provider handles</h4>
-        <ul>
-          <li>Physical security of data centers</li>
-          <li>Keeping servers running & patched</li>
-          <li>Protecting the underlying network</li>
-        </ul>
-      </div>
-      <div class="resp-card you">
-        <h4>🧑 You handle</h4>
-        <ul>
-          <li>Using a strong, unique password</li>
-          <li>Turning on two-factor authentication</li>
-          <li>Not sharing your login with randoms</li>
-        </ul>
-      </div>
-    </div>
-    <p class="lede" style="margin-top:20px;">It's not scary — it's just teamwork. The provider locks the building; you lock your own door.</p>
-  </section>
-
-  <!-- 7. CAREERS -->
+  <!-- 6. CAREERS -->
   <section id="careers">
     <span class="eyebrow">🚀 Where this leads</span>
     <h2 class="section-title">Could this be a career?</h2>
-    <p class="lede">Cloud skills are some of the most in-demand in tech right now, and you can start exploring them before you even finish high school.</p>
+    <p class="lede">Every company with an online presence needs people defending it — and it pays well.</p>
     <div class="career-list">
-      <div class="career-row"><span class="emoji">☁️</span><div><h4>Cloud Engineer</h4><p>Designs and manages the systems that run on cloud platforms like AWS, Azure, or Google Cloud.</p></div></div>
-      <div class="career-row"><span class="emoji">🔁</span><div><h4>DevOps Engineer</h4><p>Automates how software gets built, tested, and deployed to the cloud, fast and reliably.</p></div></div>
-      <div class="career-row"><span class="emoji">🛡️</span><div><h4>Cloud Security</h4><p>Focuses on keeping cloud systems and data locked down against threats.</p></div></div>
+      <div class="career-row"><span class="emoji">🕵️</span><div><h4>Ethical Hacker / Penetration Tester</h4><p>Gets paid to legally break into systems to find weaknesses before real attackers do.</p></div></div>
+      <div class="career-row"><span class="emoji">🖥️</span><div><h4>SOC Analyst</h4><p>Monitors systems in real time, spotting and responding to attacks as they happen.</p></div></div>
+      <div class="career-row"><span class="emoji">🛡️</span><div><h4>Security Consultant</h4><p>Advises organizations on how to protect their systems and data before something goes wrong.</p></div></div>
     </div>
     <div class="badge-row">
-      <span class="badge">🎓 AWS Cloud Practitioner — entry-level, no degree needed</span>
+      <span class="badge">🎓 CompTIA Security+ — entry-level, no degree needed</span>
       <span class="badge">🎓 Achievable while still in school</span>
     </div>
     <div class="cta">
       <h3>Curious where this could take you?</h3>
-      <p>Studying Computer Science at university is one of the best ways to go deeper into cloud computing, software, and everything in between.</p>
+      <p>Studying Computer Science or cybersecurity at university is one of the best ways to go deeper into defending systems and data.</p>
     </div>
   </section>
 
-  <!-- 8. QUIZ -->
+  <!-- 7. QUIZ -->
   <section id="quiz">
     <span class="eyebrow">🎮 Quick game</span>
-    <h2 class="section-title">SaaS, PaaS, or IaaS?</h2>
+    <h2 class="section-title">Spot the phish (or the weak password)</h2>
     <p class="lede">Tap the answer you think is right. No pressure, no scores that matter — just a quick check that it clicked.</p>
     <div class="quiz-intro">
       <span>👆 Click any option below to answer instantly</span>
@@ -638,19 +593,19 @@
 <div class="cross-promo">
   <h3>Keep exploring the site</h3>
   <div class="cross-grid">
+    <a class="cross-card" href="index.html">
+      <span class="emoji">☁️</span>
+      <div><h4>Wondering where your data actually lives?</h4><p>Check out Cloud Computing →</p></div>
+    </a>
     <a class="cross-card" href="networking.html">
       <span class="emoji">📡</span>
       <div><h4>Curious how networks move your data?</h4><p>Check out Networking →</p></div>
-    </a>
-    <a class="cross-card" href="cybersecurity.html">
-      <span class="emoji">🔐</span>
-      <div><h4>Want to know how to stay safe online?</h4><p>Check out Cybersecurity →</p></div>
     </a>
   </div>
 </div>
 
 <footer>
-  Built for Year 11–13 students exploring cloud computing • Fiji 🇫🇯
+  Built for Year 11–13 students exploring cybersecurity • Fiji 🇫🇯
 </footer>
 
 <button id="back-to-top" aria-label="Back to top">↑</button>
@@ -689,16 +644,45 @@
   });
   backBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
 
-  // ---- Quiz ----
+  // ---- Quiz (each question carries its own options) ----
   const quizData = [
-    { q: "Gmail — you just log in and use it, no installing anything.", answer: "SaaS" },
-    { q: "Renting a virtual server on AWS EC2 to run whatever you want on it.", answer: "IaaS" },
-    { q: "A platform developers use to build and deploy their own app, without managing servers.", answer: "PaaS" },
-    { q: "Netflix — open the app, stream, done.", answer: "SaaS" },
-    { q: "Renting raw storage and computing power by the hour for your own project.", answer: "IaaS" },
-    { q: "A ready-made environment where coders push their app and it just runs.", answer: "PaaS" },
+    {
+      q: "A friend's account messages you: \"bro is this you?? 😳 [shady-link.tk]\"",
+      options: ["Legit", "Phishing"],
+      answer: "Phishing",
+      note: "Urgent, shocking, and a weird shortened link — classic bait to get you to click without thinking."
+    },
+    {
+      q: "Password: password123",
+      options: ["Weak", "Strong"],
+      answer: "Weak",
+      note: "It's one of the most common passwords in the world — attackers try these first."
+    },
+    {
+      q: "Email: \"Your Netflix payment failed, update your card here: netfliix-billing.com\"",
+      options: ["Legit", "Phishing"],
+      answer: "Phishing",
+      note: "Look closely — \"netfliix\" has an extra i. Misspelled domains are a huge red flag."
+    },
+    {
+      q: "Password: Tr0pic@lFiji!27sunset",
+      options: ["Weak", "Strong"],
+      answer: "Strong",
+      note: "Long, random-feeling, mixes cases, numbers, and symbols — hard to guess or crack."
+    },
+    {
+      q: "A text from your mobile provider's official short code confirming your data top-up.",
+      options: ["Legit", "Phishing"],
+      answer: "Legit",
+      note: "A confirmation with no link, no urgency, and no request for details is usually just... fine."
+    },
+    {
+      q: "Password: 123456",
+      options: ["Weak", "Strong"],
+      answer: "Weak",
+      note: "Still one of the most-used passwords ever recorded. It would be guessed in under a second."
+    },
   ];
-  const options = ["SaaS", "PaaS", "IaaS"];
 
   let current = 0;
   let score = 0;
@@ -725,7 +709,7 @@
     scoreLiveEl.textContent = `Score so far: ${score}`;
     qEl.textContent = quizData[current].q;
     optsEl.innerHTML = '';
-    options.forEach(opt => {
+    quizData[current].options.forEach(opt => {
       const btn = document.createElement('button');
       btn.className = 'quiz-btn';
       btn.textContent = opt;
@@ -738,19 +722,19 @@
   function handleAnswer(choice, btnEl){
     if (answered) return;
     answered = true;
-    const correct = quizData[current].answer;
+    const item = quizData[current];
     const allBtns = optsEl.querySelectorAll('.quiz-btn');
     allBtns.forEach(b => {
       b.disabled = true;
-      if (b.textContent === correct) b.classList.add('correct');
+      if (b.textContent === item.answer) b.classList.add('correct');
     });
-    if (choice === correct){
+    if (choice === item.answer){
       score++;
-      fbEl.textContent = '✅ Nice! That\'s correct.';
+      fbEl.textContent = `✅ Nice! ${item.note}`;
       fbEl.classList.add('good');
     } else {
       btnEl.classList.add('wrong');
-      fbEl.textContent = `❌ Not quite — it's ${correct}.`;
+      fbEl.textContent = `❌ Not quite — it's ${item.answer}. ${item.note}`;
       fbEl.classList.add('bad');
     }
     scoreLiveEl.textContent = `Score so far: ${score}`;
@@ -773,9 +757,9 @@
     quizDone.hidden = false;
     finalScoreEl.textContent = `${score} / ${quizData.length}`;
     let msg;
-    if (score === quizData.length) msg = "Perfect score! You've got SaaS, PaaS, and IaaS down. 🎉";
-    else if (score >= quizData.length - 2) msg = "Solid! You clearly get the difference.";
-    else msg = "Good effort — scroll back up to Service Layers for a quick recap.";
+    if (score === quizData.length) msg = "Perfect score! You'd spot a scam a mile away. 🎉";
+    else if (score >= quizData.length - 2) msg = "Solid! You've got a good instinct for this.";
+    else msg = "Good effort — scroll back up to Protect Yourself for a quick recap.";
     finalMsgEl.textContent = msg;
   }
 
