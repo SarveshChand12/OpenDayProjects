@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QR Scavenger Hunt &amp; Prize Wheel</title>
+<script src="vendor/qrcode.js"></script>
+<style>
+  :root {
+    --bg1: #6d28d9;
+    --bg2: #db2777;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --accent: #7c3aed;
+    --good: #16a34a;
+    --lock: #d1d5db;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 480px;
+    padding: 32px 28px;
+    text-align: center;
+  }
+  h1 { font-size: 1.5rem; margin: 0 0 6px; }
+  h2 { font-size: 1.2rem; margin: 0 0 16px; }
+  p.subtitle { color: var(--muted); margin: 0 0 24px; }
+  .hidden { display: none !important; }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    outline: none;
+    margin-bottom: 16px;
+  }
+  input[type="text"]:focus { border-color: var(--accent); }
+
+  button {
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+  }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #fff; width: 100%; }
+  .btn-secondary { background: #f3f4f6; color: var(--text); width: 100%; margin-top: 10px; }
+  .btn-small { background: #f3f4f6; color: var(--text); padding: 8px 14px; font-size: 0.85rem; }
+
+  .progress-wrap { margin: 20px 0; }
+  .progress-bar { background: #e5e7eb; border-radius: 999px; height: 12px; overflow: hidden; }
+  .progress-fill { background: var(--good); height: 100%; width: 0%; transition: width 0.4s ease; }
+  .progress-label { margin-top: 8px; font-weight: 600; color: var(--muted); }
+
+  .qr-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
+  .qr-slot {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: var(--lock);
+    color: #9ca3af;
+  }
+  .qr-slot.found { background: var(--good); color: #fff; }
+
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111827;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, top 0.3s ease;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; top: 30px; }
+
+  footer { margin-top: 24px; font-size: 0.8rem; color: var(--muted); }
+  footer a { color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+  /* Admin */
+  .student-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: left;
+  }
+  .student-row .name { font-weight: 600; }
+  .student-row .status { font-size: 0.85rem; color: var(--muted); }
+  .badge { padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+  .badge.entered { background: #dcfce7; color: var(--good); }
+  .badge.waiting { background: #fef3c7; color: #b45309; }
+  .badge.won { background: #ede9fe; color: var(--accent); }
+
+  /* QR print sheet */
+  .qr-print-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .qr-print-item { border: 2px dashed #ccc; border-radius: 12px; padding: 16px; }
+  .qr-print-item img, .qr-print-item canvas { margin: 8px auto; }
+
+  /* Wheel */
+  .wheel-wrap {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 10px auto 24px;
+  }
+  .wheel-pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 22px solid #111827;
+    z-index: 5;
+  }
+  #wheelCanvas {
+    border-radius: 50%;
+    box-shadow: 0 0 0 8px #111827, 0 10px 30px rgba(0,0,0,0.3);
+  }
+  #winnerReveal { margin-top: 10px; font-size: 1.3rem; font-weight: 800; color: var(--accent); min-height: 1.6em; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN SCREEN -->
+<section class="card" id="screen-login">
+  <h1>🎉 Scavenger Hunt</h1>
+  <p class="subtitle">Enter your name to start hunting for QR codes!</p>
+  <input type="text" id="nameInput" placeholder="Your full name" autocomplete="off" />
+  <button class="btn-primary" id="startBtn">Start Hunting</button>
+  <footer>
+    <a id="printLink">Print the 5 QR codes</a> &middot;
+    <a id="adminLinkLogin">Host view</a>
+  </footer>
+</section>
+
+<!-- HUNT SCREEN -->
+<section class="card hidden" id="screen-hunt">
+  <h1>Hi, <span id="huntName"></span>! 👋</h1>
+  <p class="subtitle">Find and scan all 5 QR codes hidden around the venue.</p>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label"><span id="progressCount">0</span> / 5 QR codes found</div>
+  </div>
+  <div class="qr-grid" id="qrGrid"></div>
+  <button class="btn-secondary" id="simulateScanBtn">Simulate next scan (testing only)</button>
+  <footer>
+    Not <span id="huntName2"></span>? <a id="switchUserLink">Switch user</a> &middot;
+    <a id="adminLinkHunt">Host view</a>
+  </footer>
+</section>
+
+<!-- ENTERED SCREEN -->
+<section class="card hidden" id="screen-entered">
+  <h1>🏆 You're entered!</h1>
+  <p class="subtitle" id="enteredMsg">Great job! You found all 5 QR codes and are now in the prize draw. Good luck!</p>
+  <button class="btn-secondary" id="backHomeBtn">Back to start</button>
+</section>
+
+<!-- QR PRINT SHEET (for host to print/display QR codes) -->
+<section class="card hidden" id="screen-print" style="max-width:640px;">
+  <h1>Print / Display QR Codes</h1>
+  <p class="subtitle">Place these 5 codes around the venue for students to find and scan with their phone camera.</p>
+  <div class="qr-print-grid" id="qrPrintGrid"></div>
+  <button class="btn-secondary" id="closePrintBtn">Close</button>
+</section>
+
+<!-- ADMIN SCREEN -->
+<section class="card hidden" id="screen-admin" style="max-width:560px;">
+  <h1>Host Controls</h1>
+  <p class="subtitle">Track student progress and draw a random winner.</p>
+  <div id="studentList" style="max-height:260px; overflow-y:auto; margin-bottom:16px;"></div>
+  <button class="btn-primary" id="drawWinnerBtn">🎯 Draw Random Winner</button>
+  <button class="btn-secondary" id="viewPrintFromAdmin">Show printable QR codes</button>
+  <button class="btn-small" id="resetAllBtn" style="margin-top:16px; background:#fee2e2; color:#b91c1c;">Reset all data (testing)</button>
+  <footer><a id="backHuntFromAdmin">Back</a></footer>
+</section>
+
+<!-- WHEEL SCREEN -->
+<section class="card hidden" id="screen-wheel">
+  <h1 id="wheelWinnerName">Winner: —</h1>
+  <p class="subtitle">Spin the wheel to reveal the prize!</p>
+  <div class="wheel-wrap">
+    <div class="wheel-pointer"></div>
+    <canvas id="wheelCanvas" width="280" height="280"></canvas>
+  </div>
+  <button class="btn-primary" id="spinBtn">SPIN THE WHEEL</button>
+  <div id="winnerReveal"></div>
+  <footer><a id="backAdminFromWheel">Back to host view</a></footer>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Config ----
+  var TOTAL_QR = 5;
+  var PRIZES = ["Prize 1", "Prize 2", "Prize 3", "Prize 4", "Prize 5", "Prize 6"];
+  var WHEEL_COLORS = ["#7c3aed", "#db2777", "#f59e0b", "#16a34a", "#0ea5e9", "#ef4444"];
+  var ADMIN_PASSCODE = "1234"; // simple deterrent only, not real security
+
+  // ---- Storage helpers ----
+  var STORAGE_KEY = "qrhunt_students_v1";
+  var CURRENT_KEY = "qrhunt_current_v1";
+
+  function loadStudents() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function saveStudents(students) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+  }
+  function getCurrentName() {
+    return localStorage.getItem(CURRENT_KEY) || "";
+  }
+  function setCurrentName(name) {
+    localStorage.setItem(CURRENT_KEY, name);
+  }
+  function keyFor(name) {
+    return name.trim().toLowerCase();
+  }
+  function getOrCreateStudent(name) {
+    var students = loadStudents();
+    var k = keyFor(name);
+    if (!students[k]) {
+      students[k] = { name: name.trim(), found: {}, enteredAt: null, prizeWon: null };
+      saveStudents(students);
+    }
+    return students[k];
+  }
+
+  // ---- Toast ----
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.classList.remove("show");
+    }, 2200);
+  }
+
+  // ---- Screen switching ----
+  var screens = ["login", "hunt", "entered", "print", "admin", "wheel"].reduce(function (acc, id) {
+    acc[id] = document.getElementById("screen-" + id);
+    return acc;
+  }, {});
+  function showScreen(id) {
+    Object.keys(screens).forEach(function (key) {
+      screens[key].classList.toggle("hidden", key !== id);
+    });
+  }
+
+  // ---- Login ----
+  var nameInput = document.getElementById("nameInput");
+  document.getElementById("startBtn").addEventListener("click", function () {
+    var name = nameInput.value.trim();
+    if (!name) {
+      showToast("Please enter your name");
+      return;
+    }
+    setCurrentName(name);
+    getOrCreateStudent(name);
+    consumePendingQr();
+    enterHunt();
+  });
+  nameInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("startBtn").click();
+  });
+
+  document.getElementById("switchUserLink").addEventListener("click", function () {
+    setCurrentName("");
+    showScreen("login");
+    nameInput.value = "";
+    nameInput.focus();
+  });
+  document.getElementById("backHomeBtn").addEventListener("click", function () {
+    setCurrentName("");
+    showScreen("login");
+    nameInput.value = "";
+  });
+
+  // ---- Hunt screen ----
+  function renderHunt() {
+    var name = getCurrentName();
+    var student = getOrCreateStudent(name);
+    document.getElementById("huntName").textContent = student.name;
+    document.getElementById("huntName2").textContent = student.name;
+
+    var foundCount = 0;
+    var grid = document.getElementById("qrGrid");
+    grid.innerHTML = "";
+    for (var i = 1; i <= TOTAL_QR; i++) {
+      var found = !!student.found[i];
+      if (found) foundCount++;
+      var slot = document.createElement("div");
+      slot.className = "qr-slot" + (found ? " found" : "");
+      slot.textContent = found ? "✓" : i;
+      grid.appendChild(slot);
+    }
+    document.getElementById("progressCount").textContent = foundCount;
+    document.getElementById("progressFill").style.width = (foundCount / TOTAL_QR * 100) + "%";
+
+    var simBtn = document.getElementById("simulateScanBtn");
+    simBtn.disabled = foundCount >= TOTAL_QR;
+
+    if (foundCount >= TOTAL_QR && !student.enteredAt) {
+      student.enteredAt = Date.now();
+      var students = loadStudents();
+      students[keyFor(student.name)] = student;
+      saveStudents(students);
+    }
+  }
+
+  function enterHunt() {
+    renderHunt();
+    var student = getOrCreateStudent(getCurrentName());
+    var foundCount = Object.keys(student.found).filter(function (k) { return student.found[k]; }).length;
+    if (foundCount >= TOTAL_QR) {
+      showEntered();
+    } else {
+      showScreen("hunt");
+    }
+  }
+
+  function showEntered() {
+    var student = getOrCreateStudent(getCurrentName());
+    var msg = "Great job! You found all 5 QR codes and are now in the prize draw. Good luck!";
+    if (student.prizeWon) {
+      msg = "🎊 You already won " + student.prizeWon + "! Congratulations!";
+    }
+    document.getElementById("enteredMsg").textContent = msg;
+    showScreen("entered");
+  }
+
+  function markQrFound(qrNum) {
+    var name = getCurrentName();
+    if (!name) return false;
+    var student = getOrCreateStudent(name);
+    if (student.found[qrNum]) {
+      showToast("QR #" + qrNum + " already scanned");
+      return false;
+    }
+    student.found[qrNum] = true;
+    var students = loadStudents();
+    students[keyFor(student.name)] = student;
+    saveStudents(students);
+    showToast("✅ QR #" + qrNum + " found!");
+    return true;
+  }
+
+  // Testing helper: simulate scanning the next unfound QR code without a real camera.
+  document.getElementById("simulateScanBtn").addEventListener("click", function () {
+    var student = getOrCreateStudent(getCurrentName());
+    for (var i = 1; i <= TOTAL_QR; i++) {
+      if (!student.found[i]) {
+        markQrFound(i);
+        break;
+      }
+    }
+    renderHunt();
+    // Re-fetch after markQrFound, since the `student` object above is a
+    // separate snapshot that markQrFound's own save does not mutate.
+    var updated = getOrCreateStudent(getCurrentName());
+    var foundCount = Object.keys(updated.found).filter(function (k) { return updated.found[k]; }).length;
+    if (foundCount >= TOTAL_QR) {
+      setTimeout(showEntered, 500);
+    }
+  });
+
+  // ---- QR param handling (real scans open index.html?qr=N) ----
+  function handleQrParam() {
+    var params = new URLSearchParams(window.location.search);
+    var qr = params.get("qr");
+    if (!qr) return;
+    var qrNum = parseInt(qr, 10);
+    // Clean the URL so refreshing doesn't re-trigger the scan.
+    var cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+
+    if (qrNum < 1 || qrNum > TOTAL_QR) return;
+
+    if (!getCurrentName()) {
+      sessionStorage.setItem("qrhunt_pending_qr", String(qrNum));
+      showScreen("login");
+      showToast("Enter your name, then we'll log this scan");
+      return;
+    }
+    markQrFound(qrNum);
+  }
+
+  function consumePendingQr() {
+    var pending = sessionStorage.getItem("qrhunt_pending_qr");
+    if (pending) {
+      sessionStorage.removeItem("qrhunt_pending_qr");
+      markQrFound(parseInt(pending, 10));
+    }
+  }
+
+  // ---- Print sheet ----
+  document.getElementById("printLink").addEventListener("click", function () {
+    buildPrintGrid();
+    showScreen("print");
+  });
+  document.getElementById("closePrintBtn").addEventListener("click", function () {
+    showScreen("login");
+  });
+  document.getElementById("viewPrintFromAdmin").addEventListener("click", function () {
+    buildPrintGrid();
+    showScreen("print");
+  });
+
+  function buildPrintGrid() {
+    var grid = document.getElementById("qrPrintGrid");
+    grid.innerHTML = "";
+    var baseUrl = window.location.origin + window.location.pathname;
+    for (var i = 1; i <= TOTAL_QR; i++) {
+      var item = document.createElement("div");
+      item.className = "qr-print-item";
+      var label = document.createElement("div");
+      label.style.fontWeight = "700";
+      label.textContent = "QR Code #" + i;
+      var qrDiv = document.createElement("div");
+      item.appendChild(label);
+      item.appendChild(qrDiv);
+      grid.appendChild(item);
+      /* global qrcode */
+      var qr = qrcode(0, "M");
+      qr.addData(baseUrl + "?qr=" + i);
+      qr.make();
+      qrDiv.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2 });
+    }
+  }
+
+  // ---- Admin ----
+  function checkAdminAccess() {
+    var entered = prompt("Host passcode:");
+    return entered === ADMIN_PASSCODE;
+  }
+  function openAdmin() {
+    if (!checkAdminAccess()) {
+      showToast("Incorrect passcode");
+      return;
+    }
+    renderAdmin();
+    showScreen("admin");
+  }
+  document.getElementById("adminLinkHunt").addEventListener("click", openAdmin);
+  document.getElementById("adminLinkLogin").addEventListener("click", openAdmin);
+  document.getElementById("backHuntFromAdmin").addEventListener("click", function () {
+    if (getCurrentName()) {
+      enterHunt();
+    } else {
+      showScreen("login");
+    }
+  });
+
+  function renderAdmin() {
+    var students = loadStudents();
+    var list = document.getElementById("studentList");
+    list.innerHTML = "";
+    var names = Object.keys(students);
+    if (names.length === 0) {
+      list.innerHTML = '<p class="subtitle">No students yet.</p>';
+    }
+    names.sort(function (a, b) {
+      return students[a].name.localeCompare(students[b].name);
+    });
+    names.forEach(function (k) {
+      var s = students[k];
+      var foundCount = Object.keys(s.found).filter(function (fk) { return s.found[fk]; }).length;
+      var row = document.createElement("div");
+      row.className = "student-row";
+
+      var left = document.createElement("div");
+      var nameDiv = document.createElement("div");
+      nameDiv.className = "name";
+      nameDiv.textContent = s.name;
+      var statusDiv = document.createElement("div");
+      statusDiv.className = "status";
+      statusDiv.textContent = foundCount + " / " + TOTAL_QR + " QR codes";
+      left.appendChild(nameDiv);
+      left.appendChild(statusDiv);
+
+      var badge = document.createElement("span");
+      if (s.prizeWon) {
+        badge.className = "badge won";
+        badge.textContent = "Won " + s.prizeWon;
+      } else if (s.enteredAt) {
+        badge.className = "badge entered";
+        badge.textContent = "In draw";
+      } else {
+        badge.className = "badge waiting";
+        badge.textContent = "Hunting";
+      }
+
+      row.appendChild(left);
+      row.appendChild(badge);
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById("resetAllBtn").addEventListener("click", function () {
+    if (!confirm("This clears all student progress and winners. Continue?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(CURRENT_KEY);
+    renderAdmin();
+    showToast("All data reset");
+  });
+
+  // ---- Winner draw + wheel ----
+  var currentWinnerKey = null;
+
+  document.getElementById("drawWinnerBtn").addEventListener("click", function () {
+    var students = loadStudents();
+    var eligible = Object.keys(students).filter(function (k) {
+      return students[k].enteredAt && !students[k].prizeWon;
+    });
+    if (eligible.length === 0) {
+      showToast("No eligible students (need 5/5 QR codes, not already won)");
+      return;
+    }
+    var pick = eligible[Math.floor(Math.random() * eligible.length)];
+    currentWinnerKey = pick;
+    document.getElementById("wheelWinnerName").textContent = "Winner: " + students[pick].name;
+    document.getElementById("winnerReveal").textContent = "";
+    document.getElementById("spinBtn").disabled = false;
+    drawWheel();
+    showScreen("wheel");
+  });
+
+  document.getElementById("backAdminFromWheel").addEventListener("click", function () {
+    renderAdmin();
+    showScreen("admin");
+  });
+
+  var wheelCanvas = document.getElementById("wheelCanvas");
+  var wheelRotation = 0;
+
+  function drawWheel() {
+    var ctx = wheelCanvas.getContext("2d");
+    var w = wheelCanvas.width, h = wheelCanvas.height;
+    var cx = w / 2, cy = h / 2, r = cx - 6;
+    var n = PRIZES.length;
+    var slice = (2 * Math.PI) / n;
+    ctx.clearRect(0, 0, w, h);
+    for (var i = 0; i < n; i++) {
+      var start = i * slice - Math.PI / 2;
+      var end = start + slice;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, start, end);
+      ctx.closePath();
+      ctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length];
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(start + slice / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 15px sans-serif";
+      ctx.fillText(PRIZES[i], r - 14, 5);
+      ctx.restore();
+    }
+  }
+
+  document.getElementById("spinBtn").addEventListener("click", function () {
+    if (!currentWinnerKey) return;
+    var spinBtn = document.getElementById("spinBtn");
+    spinBtn.disabled = true;
+
+    var n = PRIZES.length;
+    var winIndex = Math.floor(Math.random() * n);
+    var sliceDeg = 360 / n;
+    var targetCenterDeg = winIndex * sliceDeg + sliceDeg / 2;
+    var extraSpins = 6; // full rotations for visual effect
+    var finalDeg = wheelRotation + extraSpins * 360 + ((360 - targetCenterDeg) - (wheelRotation % 360));
+
+    wheelCanvas.style.transition = "transform 4.2s cubic-bezier(0.12, 0.67, 0.1, 1)";
+    wheelCanvas.style.transform = "rotate(" + finalDeg + "deg)";
+    wheelRotation = finalDeg;
+
+    setTimeout(function () {
+      var prize = PRIZES[winIndex];
+      var students = loadStudents();
+      var s = students[currentWinnerKey];
+      s.prizeWon = prize;
+      saveStudents(students);
+      document.getElementById("winnerReveal").textContent = "🎉 " + s.name + " wins " + prize + "! 🎉";
+      showToast(s.name + " won " + prize + "!");
+    }, 4300);
+  });
+
+  // ---- Init ----
+  function init() {
+    handleQrParam();
+    var name = getCurrentName();
+    if (name) {
+      consumePendingQr();
+      var student = getOrCreateStudent(name);
+      var foundCount = Object.keys(student.found).filter(function (k) { return student.found[k]; }).length;
+      if (foundCount >= TOTAL_QR) {
+        showEntered();
+      } else {
+        renderHunt();
+        showScreen("hunt");
+      }
+    } else {
+      showScreen("login");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
