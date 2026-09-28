@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Networking 101 — Fiji Edition</title>
-<meta name="description" content="A self-guided intro to how networks and the internet actually work, for Year 11-13 students in Fiji.">
+<title>Cloud in Action: Uses &amp; History — Fiji Edition</title>
+<meta name="description" content="Where cloud computing is really used today, and the history of how it got here — for Year 11-13 students in Fiji.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -47,7 +47,7 @@
 
   .wrap{max-width:var(--maxw); margin:0 auto; padding:0 20px;}
 
-  /* ---------- Site-wide nav (persistent across all 3 pages) ---------- */
+  /* ---------- Site-wide nav (persistent across all pages) ---------- */
   .site-nav{
     position:sticky; top:0; z-index:120;
     background:#0a0c1e;
@@ -160,7 +160,7 @@
     padding:26px; margin-top:22px; position:relative; overflow:hidden;
   }
   .analogy-card::before{
-    content:"🛣️"; position:absolute; right:16px; top:10px; font-size:4rem; opacity:.12;
+    content:"🌍"; position:absolute; right:16px; top:10px; font-size:4rem; opacity:.12;
   }
   .analogy-card h3{color:var(--accent3); font-size:1.1rem;}
 
@@ -333,51 +333,6 @@
   .cta h3{font-size:1.3rem; margin-bottom:6px;}
   .cta p{color:rgba(255,255,255,.85); max-width:60ch; margin:0 auto;}
 
-  /* ---------- Quiz ---------- */
-  .quiz-intro{
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    background:var(--card-alt); border:1px solid var(--border); border-radius:14px;
-    padding:14px 16px; margin:22px 0 26px; font-size:.9rem; color:var(--text-dim);
-  }
-  .quiz-progress{
-    font-weight:700; color:var(--accent3); margin-left:auto;
-  }
-  .quiz-card{
-    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
-    padding:24px;
-  }
-  .quiz-q{font-size:1.1rem; font-weight:600; margin-bottom:16px;}
-  .quiz-options{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;}
-  @media (max-width:560px){ .quiz-options{grid-template-columns:1fr;} }
-  .quiz-btn{
-    cursor:pointer; border:2px solid var(--border); background:var(--bg-alt);
-    color:var(--text); font-family:inherit; font-weight:700; font-size:.95rem;
-    border-radius:12px; padding:14px 10px; transition:.15s; text-align:center;
-  }
-  .quiz-btn:hover{border-color:var(--accent2); transform:translateY(-2px);}
-  .quiz-btn.correct{background:#1f5e3f; border-color:#4ade80; color:#eafff2;}
-  .quiz-btn.wrong{background:#5e2233; border-color:var(--accent); color:#ffe4ec;}
-  .quiz-btn:disabled{cursor:default; transform:none;}
-  .quiz-feedback{
-    margin-top:14px; font-size:.9rem; min-height:1.4em; font-weight:600;
-  }
-  .quiz-feedback.good{color:#4ade80;}
-  .quiz-feedback.bad{color:var(--accent);}
-  .quiz-nav{display:flex; justify-content:space-between; align-items:center; margin-top:18px;}
-  .quiz-next{
-    background:var(--accent2); color:var(--bg); border:none; border-radius:999px;
-    padding:10px 20px; font-weight:800; cursor:pointer; font-size:.9rem;
-    opacity:.4; pointer-events:none; transition:.2s;
-  }
-  .quiz-next.ready{opacity:1; pointer-events:auto;}
-  .quiz-done{
-    text-align:center; padding:20px 0;
-  }
-  .quiz-done .score{font-size:2.4rem; font-family:'Poppins',sans-serif; font-weight:800; color:var(--accent3);}
-  .retry-btn{
-    margin-top:14px; background:var(--accent4); color:#fff; border:none;
-    border-radius:999px; padding:10px 22px; font-weight:700; cursor:pointer;
-  }
   [hidden]{display:none!important;}
 
   /* ---------- Footer / back to top ---------- */
@@ -406,9 +361,9 @@
     <a class="site-brand" href="index.html"><span class="dot"></span>TechEd Fiji</a>
     <nav class="site-links" aria-label="Site pages">
       <a href="index.html">☁️ Cloud Computing</a>
-      <a href="networking.html" class="current">📡 Networking</a>
+      <a href="networking.html">📡 Networking</a>
       <a href="cybersecurity.html">🔐 Cybersecurity</a>
-      <a href="cloud-in-action.html">🕰️ Cloud in Action</a>
+      <a href="cloud-in-action.html" class="current">🕰️ Cloud in Action</a>
     </nav>
   </div>
 </div>
@@ -417,21 +372,17 @@
   <div class="topbar-inner">
     <nav class="toc" id="tocNav" aria-label="Section navigation">
       <a href="#hook">Hook</a>
-      <a href="#what-is-network">What is a Network</a>
-      <a href="#types">Types</a>
-      <a href="#how-data-travels">How Data Travels</a>
-      <a href="#speed-reliability">Speed &amp; Reliability</a>
+      <a href="#uses">Where It's Used</a>
+      <a href="#fiji">Fiji &amp; the Pacific</a>
       <a href="#history">History</a>
-      <a href="#careers">Careers</a>
-      <a href="#trace">Trace the Packet</a>
     </nav>
   </div>
 </div>
 
 <div class="intro-strip">
   <div class="wrap">
-    <span>📖 <strong>What's this page?</strong> A self-guided tour of how networks and the internet actually work — jump to any section, no set order.</span>
-    <span>⏱️ <strong>~7 min read</strong> + a click-through diagram at the end.</span>
+    <span>📖 <strong>What's this page?</strong> A self-guided look at where cloud computing shows up in real life, and how it got here — jump to any section, no set order.</span>
+    <span>⏱️ <strong>~6 min read</strong>, with a click-through timeline at the end.</span>
   </div>
 </div>
 
@@ -440,158 +391,100 @@
   <!-- 1. HOOK -->
   <section id="hook" class="hero">
     <span class="eyebrow">👋 Start here</span>
-    <h1>How does a message reach your friend's phone in under a second?</h1>
+    <h1>From mainframes to your pocket — how did "the cloud" get this big?</h1>
     <p class="lede">
-      You send a text to a friend on the other side of the world, and it just… arrives.
-      Instantly. No wires you can see, no waiting. That's <strong>networking</strong> — the
-      system of connections that quietly moves your data across the planet, every single
-      time you're online.
+      Quick recap in case you're landing here first: <strong>cloud computing</strong> means
+      using storage, processing power, and software that live on someone else's servers,
+      accessed over the internet, instead of running your own equipment. This page is about
+      two things — where it's actually being used today, and the surprisingly long history
+      behind how we got here.
     </p>
-    <p class="lede">Everyday things that depend on networking working properly:</p>
+    <p class="lede">A taste of where it shows up:</p>
     <div class="app-grid">
-      <div class="app-chip"><span class="emoji">📹</span>Video calls</div>
-      <div class="app-chip"><span class="emoji">🎮</span>Online gaming</div>
-      <div class="app-chip"><span class="emoji">💬</span>Group chats</div>
-      <div class="app-chip"><span class="emoji">📡</span>Streaming</div>
+      <div class="app-chip"><span class="emoji">🎬</span>Streaming</div>
+      <div class="app-chip"><span class="emoji">🏦</span>Banking</div>
+      <div class="app-chip"><span class="emoji">🏥</span>Healthcare</div>
+      <div class="app-chip"><span class="emoji">📚</span>Online learning</div>
+      <div class="app-chip"><span class="emoji">🌾</span>Agri-tech</div>
     </div>
   </section>
 
-  <!-- 2. WHAT IS A NETWORK -->
-  <section id="what-is-network">
-    <span class="eyebrow">🔗 The basics</span>
-    <h2 class="section-title">So what actually <em>is</em> a network?</h2>
-    <p class="lede">
-      A network is just a bunch of devices that can send stuff to each other. That's it —
-      no more complicated than that.
-    </p>
-    <div class="analogy-card">
-      <h3>Think of it like roads connecting cities 🛣️</h3>
-      <p>
-        Roads let trucks drive between cities to deliver packages. A network is the same
-        idea, except the "roads" are cables and radio signals, the "trucks" are your data,
-        and the "cities" are every device connected to it — your phone, a server, your
-        friend's laptop.
-      </p>
-    </div>
-  </section>
-
-  <!-- 3. TYPES OF NETWORKS -->
-  <section id="types">
-    <span class="eyebrow">🧩 Know the difference</span>
-    <h2 class="section-title">LAN, WAN, Wi-Fi, and "the internet" — sorted</h2>
-    <p class="lede">These four words get mixed up constantly. Here's what each one actually means.</p>
+  <!-- 2. WHERE IT'S USED TODAY -->
+  <section id="uses">
+    <span class="eyebrow">🌍 Bigger than you think</span>
+    <h2 class="section-title">Where is cloud computing actually used?</h2>
+    <p class="lede">Almost every industry you can name now runs some part of itself in the cloud.</p>
     <div class="type-grid">
       <div class="type-card">
-        <span class="tag tag-a">LAN</span>
-        <h3>Local Area Network</h3>
-        <p>Devices connected close together, usually in one building.</p>
-        <div class="examples">📌 Example: your school's Wi-Fi connecting all the classroom computers to each other.</div>
+        <span class="tag tag-a">Media</span>
+        <h3>Entertainment &amp; streaming</h3>
+        <p>Netflix, Spotify, and YouTube all serve their content straight out of cloud data centers.</p>
       </div>
       <div class="type-card">
-        <span class="tag tag-b">WAN</span>
-        <h3>Wide Area Network</h3>
-        <p>Networks connected across huge distances — even between countries.</p>
-        <div class="examples">📌 Example: the internet itself is the biggest WAN there is.</div>
+        <span class="tag tag-b">Finance</span>
+        <h3>Banking &amp; finance</h3>
+        <p>Many banks run core systems and mobile banking apps on cloud infrastructure for security and uptime.</p>
       </div>
       <div class="type-card">
-        <span class="tag tag-c">Wi-Fi</span>
-        <h3>Just how you connect</h3>
-        <p>Wi-Fi is how your device joins a network wirelessly — it's the "last few metres," not the whole internet.</p>
-        <div class="examples">📌 Example: your phone uses home Wi-Fi, but that Wi-Fi still needs its own internet connection to reach anything outside your house.</div>
+        <span class="tag tag-c">Health</span>
+        <h3>Healthcare</h3>
+        <p>Patient records, telehealth video visits, and medical research increasingly run in the cloud.</p>
       </div>
       <div class="type-card">
-        <span class="tag tag-d">Internet</span>
-        <h3>The network of networks</h3>
-        <p>The giant global network connecting everyone together. Wi-Fi is just your on-ramp to it.</p>
-        <div class="examples">📌 Example: watching YouTube uses your Wi-Fi to reach the internet, then the internet to reach YouTube's servers.</div>
+        <span class="tag tag-d">Education</span>
+        <h3>Online learning</h3>
+        <p>School and university platforms — video lessons, assignment portals, learning systems — are usually cloud-hosted.</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-a">Agriculture</span>
+        <h3>Agriculture &amp; fisheries</h3>
+        <p>Satellite and sensor data for farming and fishing fleets gets processed and stored in the cloud.</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-b">Government</span>
+        <h3>Government services</h3>
+        <p>Many government services — tax filing, ID systems, public records — run on cloud platforms for cost and reliability.</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-c">Gaming</span>
+        <h3>Gaming</h3>
+        <p>Cloud gaming and multiplayer servers rely on cloud infrastructure to handle millions of simultaneous players.</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-d">Emergency</span>
+        <h3>Disaster response</h3>
+        <p>During cyclones and natural disasters, cloud systems help coordinate emergency communication and relief efforts.</p>
       </div>
     </div>
   </section>
 
-  <!-- 4. HOW DATA TRAVELS -->
-  <section id="how-data-travels">
-    <span class="eyebrow">📦 Under the hood</span>
-    <h2 class="section-title">How does data actually travel?</h2>
-    <p class="lede">
-      Sending a message isn't one smooth beam of data — it's more like a delivery
-      service breaking your package into smaller boxes and routing each one separately.
-    </p>
-    <div class="card-grid">
-      <div class="service-card">
-        <span class="tag">Packets</span>
-        <h3>Small chunks of data</h3>
-        <p>Your message gets chopped into small pieces called packets, each sent separately and reassembled at the other end.</p>
-        <div class="examples">📌 Like splitting one big parcel into several smaller boxes so they're easier to send.</div>
-      </div>
-      <div class="service-card">
-        <span class="tag">IP address</span>
-        <h3>Every device's address</h3>
-        <p>Every device online has a unique address, so packets know exactly where they're headed.</p>
-        <div class="examples">📌 Like a street address, but for a phone, laptop, or server.</div>
-      </div>
-      <div class="service-card">
-        <span class="tag">Routers</span>
-        <h3>Traffic directors</h3>
-        <p>Routers read those addresses and forward each packet toward its destination, one hop at a time.</p>
-        <div class="examples">📌 Like a series of roundabouts, each pointing your packet the right way.</div>
-      </div>
-    </div>
-
-    <p class="lede" style="margin-top:34px;">Put together, here's the whole trip a message takes:</p>
-    <div class="diagram">
-      <div class="diagram-step"><span class="emoji">✉️</span><div class="label">Message</div><div class="sub">what you typed</div></div>
-      <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">📦</span><div class="label">Packets</div><div class="sub">chopped into pieces</div></div>
-      <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">🌐</span><div class="label">Routed</div><div class="sub">across the internet</div></div>
-      <div class="diagram-arrow">→</div>
-      <div class="diagram-step"><span class="emoji">✅</span><div class="label">Reassembled</div><div class="sub">back into your message</div></div>
-    </div>
-    <p class="diagram-caption">This all happens in milliseconds — for every message, video call, and game move you send.</p>
-
-    <div class="cable-note">
-      <span class="emoji">🏝️</span>
-      <div>
-        <strong>Remember the submarine cables from the Cloud Computing page?</strong>
-        <p style="margin:6px 0 0;">
-          This is exactly where they matter. When your packets need to cross an ocean —
-          say, from Fiji to a server in Australia or the US — they physically travel
-          through <strong>submarine internet cables</strong>: fibre-optic cables laid across
-          the ocean floor. There's no wireless shortcut for that distance; it's real cable,
-          the whole way. <a href="index.html#how-it-works">See it on the Cloud Computing page →</a>
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. SPEED & RELIABILITY -->
-  <section id="speed-reliability">
-    <span class="eyebrow">⚡ Why it matters</span>
-    <h2 class="section-title">Why speed and reliability actually matter</h2>
-    <p class="lede">You've felt bad networking before, even if you didn't call it that.</p>
+  <!-- 3. CLOUD IN FIJI & THE PACIFIC -->
+  <section id="fiji">
+    <span class="eyebrow">🇫🇯 Closer to home</span>
+    <h2 class="section-title">Cloud computing in Fiji &amp; the Pacific</h2>
+    <p class="lede">This isn't just a Silicon Valley story — cloud computing is already part of daily life across the region.</p>
     <div class="benefit-grid">
-      <div class="benefit"><span class="emoji">🎮</span><h4>Gaming lag</h4><p>High latency means there's a delay between you pressing a button and it actually happening on screen.</p></div>
-      <div class="benefit"><span class="emoji">📹</span><h4>Video call freezing</h4><p>When packets arrive late or get lost, your call stutters or freezes until they catch up.</p></div>
-      <div class="benefit"><span class="emoji">⏳</span><h4>Buffering</h4><p>Your device is pausing playback while it waits for more packets to arrive.</p></div>
-      <div class="benefit"><span class="emoji">📶</span><h4>Reliability</h4><p>A stable connection means packets consistently arrive on time, without dropping out.</p></div>
+      <div class="benefit"><span class="emoji">🎓</span><h4>Schools &amp; universities</h4><p>Regional institutions use cloud-based learning platforms so students across many islands and countries can access the same courses.</p></div>
+      <div class="benefit"><span class="emoji">🛍️</span><h4>Small businesses</h4><p>Local businesses increasingly use cloud tools for online stores, payments, and accounting instead of buying their own servers.</p></div>
+      <div class="benefit"><span class="emoji">🏛️</span><h4>Government services</h4><p>Cloud-based systems help back up critical records and deliver digital services more reliably.</p></div>
+      <div class="benefit"><span class="emoji">🌪️</span><h4>Disaster resilience</h4><p>Cloud backups mean records and services can keep running even if local infrastructure is damaged during cyclone season.</p></div>
     </div>
     <div class="scenario">
-      <h3>🇫🇯 Why this hits differently in the Pacific</h3>
+      <h3>💡 Why the cloud makes sense for smaller nations</h3>
       <p>
-        Fiji and other Pacific Island nations are physically far from the world's major
-        internet hubs, and often connect through a smaller number of submarine cable routes
-        than bigger countries. That greater distance can mean higher latency, and fewer
-        backup routes can mean bigger disruptions if a cable gets damaged. It's a big reason
-        why investing in more cable connections matters so much for the region.
+        Building and running your own data center is expensive and needs constant maintenance.
+        For a country the size of Fiji, renting cloud infrastructure from a global provider is
+        often far more practical than owning it outright — the same idea covered on the
+        <a href="index.html#what-is-cloud">Cloud Computing basics page</a>.
       </p>
     </div>
   </section>
 
-  <!-- 6. HISTORY -->
+  <!-- 4. HISTORY (INTERACTIVE) -->
   <section id="history">
-    <span class="eyebrow">🕰️ A quick look back</span>
-    <h2 class="section-title">How did we get networks like this?</h2>
-    <p class="lede">Today's instant messages are the result of decades of small breakthroughs. Tap through the highlights.</p>
+    <span class="eyebrow">🕰️ Try it yourself</span>
+    <h2 class="section-title">The history of cloud computing</h2>
+    <p class="lede">"The cloud" feels brand new, but the idea behind it is decades old. Tap through the milestones.</p>
     <div class="trace-hint">
       <span>👆 Tap any milestone to see what happened</span>
     </div>
@@ -603,42 +496,6 @@
     </div>
   </section>
 
-  <!-- 7. CAREERS -->
-  <section id="careers">
-    <span class="eyebrow">🚀 Where this leads</span>
-    <h2 class="section-title">Could this be a career?</h2>
-    <p class="lede">Every app, game, and business depends on networks working — someone has to build and run them.</p>
-    <div class="career-list">
-      <div class="career-row"><span class="emoji">📡</span><div><h4>Network Engineer</h4><p>Designs and builds the networks that keep everything connected, from school Wi-Fi to national infrastructure.</p></div></div>
-      <div class="career-row"><span class="emoji">🛠️</span><div><h4>Network Administrator</h4><p>Keeps existing networks running smoothly day to day, fixing issues before they become outages.</p></div></div>
-      <div class="career-row"><span class="emoji">📞</span><div><h4>Telecom / ISP roles</h4><p>The people and companies who build and maintain the infrastructure connecting Fiji to the rest of the world.</p></div></div>
-    </div>
-    <div class="badge-row">
-      <span class="badge">🎓 CompTIA Network+ — entry-level, no degree needed</span>
-      <span class="badge">🎓 Achievable while still in school</span>
-    </div>
-    <div class="cta">
-      <h3>Curious where this could take you?</h3>
-      <p>Studying Computer Science at university is one of the best ways to go deeper into networking, systems, and everything in between.</p>
-    </div>
-  </section>
-
-  <!-- 8. TRACE THE PACKET (INTERACTIVE) -->
-  <section id="trace">
-    <span class="eyebrow">🕹️ Try it yourself</span>
-    <h2 class="section-title">Trace the packet</h2>
-    <p class="lede">Follow a single message as it leaves your phone and lands on your friend's, right on the other side of the planet.</p>
-    <div class="trace-hint">
-      <span>👆 Tap any stop below to see what happens there</span>
-    </div>
-    <div class="trace-track" id="traceTrack"></div>
-    <div class="trace-panel" id="tracePanel">
-      <span class="trace-step-num" id="traceStepNum">Stop 1 of 7</span>
-      <h3 id="traceTitle"></h3>
-      <p id="traceDesc"></p>
-    </div>
-  </section>
-
 </main>
 
 <div class="cross-promo">
@@ -646,21 +503,21 @@
   <div class="cross-grid">
     <a class="cross-card" href="index.html">
       <span class="emoji">☁️</span>
-      <div><h4>Wondering where your data actually lives?</h4><p>Check out Cloud Computing →</p></div>
+      <div><h4>New to cloud computing basics?</h4><p>Check out Cloud Computing →</p></div>
+    </a>
+    <a class="cross-card" href="networking.html">
+      <span class="emoji">📡</span>
+      <div><h4>Curious how networks move your data?</h4><p>Check out Networking →</p></div>
     </a>
     <a class="cross-card" href="cybersecurity.html">
       <span class="emoji">🔐</span>
       <div><h4>Want to know how to stay safe online?</h4><p>Check out Cybersecurity →</p></div>
     </a>
-    <a class="cross-card" href="cloud-in-action.html">
-      <span class="emoji">🕰️</span>
-      <div><h4>Curious where cloud computing came from?</h4><p>Check out Cloud in Action →</p></div>
-    </a>
   </div>
 </div>
 
 <footer>
-  Built for Year 11–13 students exploring networking • Fiji 🇫🇯
+  Built for Year 11–13 students exploring cloud computing • Fiji 🇫🇯
 </footer>
 
 <button id="back-to-top" aria-label="Back to top">↑</button>
@@ -733,26 +590,15 @@
     selectStop(0);
   }
 
-  // ---- Trace the packet ----
+  // ---- History of cloud computing ----
   createTrace([
-    { emoji: "📱", label: "Your device", title: "It starts on your phone", desc: "You hit send. Your message is just text and data sitting on your device, about to start its trip." },
-    { emoji: "📦", label: "Packets", title: "Chopped into packets", desc: "Your message is broken into small chunks called packets, each labeled with where it's headed." },
-    { emoji: "📶", label: "Wi-Fi / router", title: "Out through Wi-Fi or mobile data", desc: "The packets leave your device over Wi-Fi or mobile data and reach your local router first." },
-    { emoji: "🏢", label: "ISP", title: "Handed to your internet provider", desc: "Your internet service provider (ISP) picks up the packets and routes them toward the internet at large." },
-    { emoji: "🌊", label: "Submarine cable", title: "Crossing the ocean", desc: "If your message is heading overseas, it now travels through a submarine fibre-optic cable running along the ocean floor, connecting Fiji to the rest of the world." },
-    { emoji: "🌐", label: "Internet backbone", title: "Hopping across routers", desc: "Along the way, multiple routers pass the packets along, each one choosing the fastest available path, hop by hop." },
-    { emoji: "📲", label: "Friend's device", title: "Reassembled and delivered", desc: "The packets arrive and get reassembled back into your original message — all in well under a second." },
-  ], { track: 'traceTrack', stepNum: 'traceStepNum', title: 'traceTitle', desc: 'traceDesc', unit: 'Stop' });
-
-  // ---- History of networking ----
-  createTrace([
-    { emoji: "🖧", label: "1969", title: "ARPANET goes live", desc: "A US military-funded project connects four university computers together — widely considered the ancestor of the modern internet." },
-    { emoji: "🔤", label: "1983", title: "TCP/IP becomes the standard", desc: "The protocols that let different networks talk to each other are adopted as the standard — the moment 'the internet' as one connected network really begins." },
-    { emoji: "🕸️", label: "1991", title: "The World Wide Web is born", desc: "Tim Berners-Lee releases the Web to the public, turning the internet from a research tool into something anyone could browse." },
-    { emoji: "📶", label: "1999", title: "Wi-Fi arrives", desc: "The Wi-Fi standard is released, letting devices connect to a network without a cable for the first time." },
-    { emoji: "📱", label: "2007–2010s", title: "Mobile internet explodes", desc: "Smartphones plus 3G/4G mean networks now have to handle billions of always-on mobile devices." },
-    { emoji: "🚀", label: "2019+", title: "5G rolls out", desc: "Faster, lower-latency mobile networks start rolling out globally, built for things like real-time gaming and connected devices." },
-    { emoji: "🏝️", label: "2020s", title: "Pacific cable expansion", desc: "New submarine cable projects connect more Pacific Island nations directly to global networks, boosting speed and reliability across the region." },
+    { emoji: "🖥️", label: "1960s", title: "Computing as a utility (the idea)", desc: "Computer scientist John McCarthy predicts computing could one day be sold \"like a utility\" — decades before the term \"cloud computing\" existed." },
+    { emoji: "💼", label: "1999", title: "Salesforce launches", desc: "Salesforce becomes one of the first companies to deliver software entirely over the internet — an early example of what we'd now call SaaS." },
+    { emoji: "☁️", label: "2006", title: "AWS launches", desc: "Amazon Web Services releases S3 and EC2, letting anyone rent storage and computing power online — widely seen as the true start of modern cloud computing." },
+    { emoji: "🏢", label: "2008–2010", title: "Google & Microsoft join in", desc: "Google App Engine and Microsoft Azure launch, turning cloud computing into a competitive, mainstream industry." },
+    { emoji: "📱", label: "2010s", title: "The app boom", desc: "Nearly every app on your phone starts relying on cloud backends to store data, sync across devices, and scale to millions of users." },
+    { emoji: "🏠", label: "2020", title: "Pandemic-driven surge", desc: "Remote work, remote school, and video calls push cloud usage to record highs almost overnight." },
+    { emoji: "🤖", label: "2020s", title: "AI and the cloud merge", desc: "Massive AI models are trained and run on cloud data centers, driving the newest wave of cloud growth." },
   ], { track: 'historyTrack', stepNum: 'historyStepNum', title: 'historyTitle', desc: 'historyDesc', unit: 'Milestone' });
 })();
 </script>

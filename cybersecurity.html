@@ -305,7 +305,7 @@
     font-size:.95rem; color:var(--text-dim); text-align:center;
     margin-bottom:16px; font-weight:600; text-transform:uppercase; letter-spacing:.04em;
   }
-  .cross-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .cross-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px;}
   @media (max-width:700px){ .cross-grid{grid-template-columns:1fr;} }
   .cross-card{
     display:flex; gap:12px; align-items:center; text-decoration:none;
@@ -408,6 +408,7 @@
       <a href="index.html">☁️ Cloud Computing</a>
       <a href="networking.html">📡 Networking</a>
       <a href="cybersecurity.html" class="current">🔐 Cybersecurity</a>
+      <a href="cloud-in-action.html">🕰️ Cloud in Action</a>
     </nav>
   </div>
 </div>
@@ -420,6 +421,7 @@
       <a href="#threats">Threats</a>
       <a href="#how-attacks-happen">How Attacks Happen</a>
       <a href="#protect-yourself">Protect Yourself</a>
+      <a href="#history">History</a>
       <a href="#careers">Careers</a>
       <a href="#quiz">Quiz</a>
     </nav>
@@ -540,7 +542,23 @@
     </div>
   </section>
 
-  <!-- 6. CAREERS -->
+  <!-- 6. HISTORY -->
+  <section id="history">
+    <span class="eyebrow">🕰️ A quick look back</span>
+    <h2 class="section-title">How did online threats get here?</h2>
+    <p class="lede">Cybersecurity as a field only exists because attacks kept evolving. Tap through the highlights.</p>
+    <div class="trace-hint">
+      <span>👆 Tap any milestone to see what happened</span>
+    </div>
+    <div class="trace-track" id="historyTrack"></div>
+    <div class="trace-panel" id="historyPanel">
+      <span class="trace-step-num" id="historyStepNum">Milestone 1 of 6</span>
+      <h3 id="historyTitle"></h3>
+      <p id="historyDesc"></p>
+    </div>
+  </section>
+
+  <!-- 7. CAREERS -->
   <section id="careers">
     <span class="eyebrow">🚀 Where this leads</span>
     <h2 class="section-title">Could this be a career?</h2>
@@ -560,7 +578,7 @@
     </div>
   </section>
 
-  <!-- 7. QUIZ -->
+  <!-- 8. QUIZ -->
   <section id="quiz">
     <span class="eyebrow">🎮 Quick game</span>
     <h2 class="section-title">Spot the phish (or the weak password)</h2>
@@ -600,6 +618,10 @@
     <a class="cross-card" href="networking.html">
       <span class="emoji">📡</span>
       <div><h4>Curious how networks move your data?</h4><p>Check out Networking →</p></div>
+    </a>
+    <a class="cross-card" href="cloud-in-action.html">
+      <span class="emoji">🕰️</span>
+      <div><h4>Curious where cloud computing came from?</h4><p>Check out Cloud in Action →</p></div>
     </a>
   </div>
 </div>
@@ -643,6 +665,50 @@
     backBtn.classList.toggle('show', window.scrollY > 500);
   });
   backBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+  // ---- Reusable clickable timeline / trace component ----
+  function createTrace(data, ids){
+    const trackEl = document.getElementById(ids.track);
+    const stepNumEl = document.getElementById(ids.stepNum);
+    const titleEl = document.getElementById(ids.title);
+    const descEl = document.getElementById(ids.desc);
+    const unit = ids.unit || 'Stop';
+    let activeIndex = 0;
+
+    function renderTrack(){
+      trackEl.innerHTML = '';
+      data.forEach((stop, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'trace-stop' + (i === activeIndex ? ' active' : '');
+        btn.type = 'button';
+        btn.innerHTML = `<span class="emoji">${stop.emoji}</span><span class="label">${stop.label}</span>`;
+        btn.addEventListener('click', () => selectStop(i));
+        trackEl.appendChild(btn);
+      });
+    }
+
+    function selectStop(i){
+      activeIndex = i;
+      renderTrack();
+      const stop = data[i];
+      stepNumEl.textContent = `${unit} ${i + 1} of ${data.length}`;
+      titleEl.textContent = `${stop.emoji} ${stop.title}`;
+      descEl.textContent = stop.desc;
+    }
+
+    renderTrack();
+    selectStop(0);
+  }
+
+  // ---- History of cybersecurity ----
+  createTrace([
+    { emoji: "🐛", label: "1971", title: "The first \"virus\"", desc: "A program called Creeper spreads between computers just to display a message — more an experiment than an attack, but the first of its kind." },
+    { emoji: "🪱", label: "1988", title: "The Morris Worm", desc: "One of the first major worms crashes thousands of early internet-connected computers, pushing the creation of the first Computer Emergency Response Team (CERT)." },
+    { emoji: "🛡️", label: "1990s", title: "Antivirus goes mainstream", desc: "As viruses spread through floppy disks and early internet downloads, antivirus software becomes a must-have on home computers." },
+    { emoji: "🎣", label: "Mid-1990s", title: "\"Phishing\" gets its name", desc: "Attackers start mass-sending fake messages on early platforms like AOL trying to trick people into handing over passwords — the term \"phishing\" is born." },
+    { emoji: "💰", label: "2010s", title: "Ransomware and mega-breaches", desc: "Attacks shift from mischief to money — ransomware locks up files for payment, and huge data breaches expose billions of accounts." },
+    { emoji: "🤖", label: "2020s", title: "AI-powered attacks and defense", desc: "Both attackers and defenders start using AI — from more convincing phishing messages to smarter systems that detect them." },
+  ], { track: 'historyTrack', stepNum: 'historyStepNum', title: 'historyTitle', desc: 'historyDesc', unit: 'Milestone' });
 
   // ---- Quiz (each question carries its own options) ----
   const quizData = [

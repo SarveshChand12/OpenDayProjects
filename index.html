@@ -305,7 +305,7 @@
     font-size:.95rem; color:var(--text-dim); text-align:center;
     margin-bottom:16px; font-weight:600; text-transform:uppercase; letter-spacing:.04em;
   }
-  .cross-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .cross-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px;}
   @media (max-width:700px){ .cross-grid{grid-template-columns:1fr;} }
   .cross-card{
     display:flex; gap:12px; align-items:center; text-decoration:none;
@@ -408,6 +408,7 @@
       <a href="index.html" class="current">☁️ Cloud Computing</a>
       <a href="networking.html">📡 Networking</a>
       <a href="cybersecurity.html">🔐 Cybersecurity</a>
+      <a href="cloud-in-action.html">🕰️ Cloud in Action</a>
     </nav>
   </div>
 </div>
@@ -645,6 +646,10 @@
     <a class="cross-card" href="cybersecurity.html">
       <span class="emoji">🔐</span>
       <div><h4>Want to know how to stay safe online?</h4><p>Check out Cybersecurity →</p></div>
+    </a>
+    <a class="cross-card" href="cloud-in-action.html">
+      <span class="emoji">🕰️</span>
+      <div><h4>Wondering who invented all this, and who uses it?</h4><p>Check out Cloud in Action →</p></div>
     </a>
   </div>
 </div>
