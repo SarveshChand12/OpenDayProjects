@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Model: Segmented Campus Network — Fiji Edition</title>
+<meta name="description" content="A briefing on our physical network model: a segmented campus network built with VLANs, a core, and a DMZ.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1226;
+    --bg-alt:#161a3a;
+    --card:#1c2049;
+    --card-alt:#232a5c;
+    --text:#eef0ff;
+    --text-dim:#b7bce0;
+    --accent:#ff5d8f;
+    --accent2:#4dd9e8;
+    --accent3:#ffd166;
+    --accent4:#7c5cff;
+    --border:#31376e;
+    --radius:18px;
+    --maxw:1100px;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:var(--stack-h,96px);}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(124,92,255,.25), transparent 45%),
+      radial-gradient(circle at 90% 10%, rgba(77,217,232,.18), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Poppins',sans-serif;}
+  h1,h2,h3{margin:0 0 .5em 0; line-height:1.2;}
+  p{margin:0 0 1em 0;}
+  a{color:var(--accent2);}
+  img,svg{max-width:100%;}
+
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 20px;}
+
+  /* ---------- Site-wide nav (persistent across all pages) ---------- */
+  .site-nav{
+    position:sticky; top:0; z-index:120;
+    background:#0a0c1e;
+    border-bottom:1px solid var(--border);
+  }
+  .site-nav-inner{
+    max-width:var(--maxw); margin:0 auto; padding:9px 16px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .site-brand{
+    font-family:'Poppins',sans-serif; font-weight:800; font-size:.95rem;
+    display:flex; align-items:center; gap:8px; white-space:nowrap;
+    color:var(--text); text-decoration:none; margin-right:2px;
+  }
+  .site-brand .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent4));
+    box-shadow:0 0 10px var(--accent);
+  }
+  .site-links{
+    display:flex; gap:4px; overflow-x:auto; scrollbar-width:none;
+  }
+  .site-links::-webkit-scrollbar{display:none;}
+  .site-links a{
+    text-decoration:none; color:var(--text-dim); font-weight:700;
+    font-size:.8rem; padding:7px 12px; border-radius:999px;
+    white-space:nowrap; border:1px solid transparent; transition:.2s;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .site-links a:hover{color:var(--text); background:var(--card-alt);}
+  .site-links a.current{
+    color:var(--bg); background:var(--accent);
+    border-color:var(--accent);
+  }
+
+  /* ---------- Top bar / intro (in-page section nav) ---------- */
+  .topbar{
+    position:sticky; z-index:100;
+    background:rgba(15,18,38,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width:var(--maxw); margin:0 auto; padding:10px 16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  nav.toc{
+    display:flex; gap:4px; overflow-x:auto; scrollbar-width:none;
+    flex:1;
+  }
+  nav.toc::-webkit-scrollbar{display:none;}
+  nav.toc a{
+    text-decoration:none; color:var(--text-dim); font-weight:600;
+    font-size:.82rem; padding:8px 12px; border-radius:999px;
+    white-space:nowrap; transition:.2s;
+    border:1px solid transparent;
+  }
+  nav.toc a:hover{color:var(--text); background:var(--card-alt);}
+  nav.toc a.active{
+    color:var(--bg); background:var(--accent2);
+    border-color:var(--accent2);
+  }
+  .intro-strip{
+    background:linear-gradient(90deg, rgba(124,92,255,.18), rgba(77,217,232,.1));
+    border-bottom:1px solid var(--border);
+    font-size:.85rem; color:var(--text-dim);
+    padding:8px 0;
+  }
+  .intro-strip .wrap{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .intro-strip strong{color:var(--text);}
+
+  /* ---------- Sections ---------- */
+  section{
+    padding:64px 0 56px;
+    border-bottom:1px solid rgba(255,255,255,.04);
+    scroll-margin-top:var(--stack-h,96px);
+  }
+  section:first-of-type{padding-top:48px;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.78rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--accent3); margin-bottom:10px;
+  }
+  .section-title{font-size:clamp(1.5rem,4vw,2.2rem);}
+  .lede{font-size:1.05rem; color:var(--text-dim); max-width:70ch;}
+
+  /* ---------- Hook ---------- */
+  .hero{
+    padding-top:40px;
+  }
+  .hero h1{
+    font-size:clamp(1.9rem,5.5vw,3rem);
+    background:linear-gradient(90deg,#fff,var(--accent2) 60%, var(--accent));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .app-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+    gap:12px; margin-top:24px;
+  }
+  .app-chip{
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:16px 12px; text-align:center; font-weight:600; font-size:.95rem;
+  }
+  .app-chip .emoji{font-size:1.8rem; display:block; margin-bottom:6px;}
+
+  /* ---------- Analogy ---------- */
+  .analogy-card{
+    background:linear-gradient(135deg,var(--card),var(--card-alt));
+    border:1px solid var(--border); border-radius:var(--radius);
+    padding:26px; margin-top:22px; position:relative; overflow:hidden;
+  }
+  .analogy-card::before{
+    content:"🧩"; position:absolute; right:16px; top:10px; font-size:4rem; opacity:.12;
+  }
+  .analogy-card h3{color:var(--accent3); font-size:1.1rem;}
+
+  /* ---------- Diagram ---------- */
+  .diagram{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px; margin:30px 0 10px; flex-wrap:nowrap; overflow-x:auto;
+    padding:10px 4px;
+  }
+  .diagram-step{
+    flex:1; min-width:110px; text-align:center; background:var(--card);
+    border:1px solid var(--border); border-radius:16px; padding:18px 10px;
+  }
+  .diagram-step .emoji{font-size:2rem; display:block; margin-bottom:8px;}
+  .diagram-step .label{font-weight:700; font-size:.85rem;}
+  .diagram-step .sub{font-size:.72rem; color:var(--text-dim); margin-top:4px;}
+  .diagram-arrow{font-size:1.4rem; color:var(--accent2); flex:0 0 auto;}
+  .diagram-caption{font-size:.85rem; color:var(--text-dim); text-align:center; margin-top:6px;}
+
+  .cable-note{
+    margin-top:24px; background:var(--card-alt); border:1px solid var(--border);
+    border-radius:var(--radius); padding:20px; display:flex; gap:14px; align-items:flex-start;
+  }
+  .cable-note .emoji{font-size:1.8rem;}
+
+  /* ---------- Why it matters ---------- */
+  .benefit-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px; margin-top:24px;
+  }
+  .benefit{
+    background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px;
+  }
+  .benefit .emoji{font-size:1.6rem;}
+  .benefit h4{margin:8px 0 4px; font-size:1rem;}
+  .benefit p{font-size:.9rem; color:var(--text-dim); margin:0;}
+
+  /* ---------- Generic tag colors ---------- */
+  .tag-a{background:var(--accent2);}
+  .tag-b{background:var(--accent3);}
+  .tag-c{background:var(--accent);}
+  .tag-d{background:var(--accent4); color:#fff;}
+
+  /* ---------- Type / concept cards (auto-fit, any count) ---------- */
+  .type-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:18px; margin-top:26px;
+  }
+  .type-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px; display:flex; flex-direction:column; gap:10px;
+  }
+  .type-card .tag{
+    align-self:flex-start; font-size:.7rem; font-weight:800; letter-spacing:.06em;
+    padding:4px 10px; border-radius:999px; color:var(--bg);
+  }
+  .type-card h3{font-size:1.15rem;}
+  .type-card .examples{
+    margin-top:auto; font-size:.85rem; color:var(--text-dim);
+    background:rgba(255,255,255,.04); border-radius:10px; padding:10px 12px;
+  }
+  .type-card .footnote{font-size:.78rem; color:var(--text-dim); margin:0;}
+
+  /* ---------- Explorable trace / journey panel (reused for topology detail) ---------- */
+  .trace-hint{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    background:var(--card-alt); border:1px solid var(--border); border-radius:14px;
+    padding:14px 16px; margin:22px 0 22px; font-size:.9rem; color:var(--text-dim);
+  }
+  .trace-panel{
+    background:linear-gradient(135deg,var(--card),var(--card-alt));
+    border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px; position:relative; min-height:96px; margin-top:18px;
+  }
+  .trace-panel h3{color:var(--accent3); font-size:1.05rem;}
+  .trace-panel p{margin:0; color:var(--text-dim);}
+  .trace-step-num{
+    font-size:.75rem; font-weight:800; color:var(--accent2); letter-spacing:.05em;
+    text-transform:uppercase; margin-bottom:6px; display:block;
+  }
+
+  /* ---------- Topology diagram (SVG) ---------- */
+  .topology-wrap{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px; margin-top:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .topology-wrap svg{display:block; width:800px; max-width:none; height:auto;}
+  @media (min-width:900px){ .topology-wrap svg{width:100%;} }
+  .topo-hit{cursor:pointer;}
+  .topo-hit rect{transition:stroke .15s, stroke-width .15s;}
+  .topo-hit:hover rect{stroke:var(--accent2); stroke-width:2.5;}
+  .topo-hit.active rect{stroke:var(--accent); stroke-width:3.5;}
+  .topo-hit text{pointer-events:none; font-family:'Inter',system-ui,sans-serif;}
+  .topo-label-title{fill:var(--text); font-weight:700;}
+  .topo-label-sub{fill:var(--text-dim);}
+  .topo-line{stroke:var(--border); stroke-width:2; fill:none;}
+  .topo-dmz{stroke:var(--text-dim); stroke-dasharray:6 5; fill:none;}
+  .topo-dmz-label{fill:var(--accent3); font-weight:800; letter-spacing:.04em;}
+
+  /* ---------- Cross-page promo (bottom of every page) ---------- */
+  .cross-promo{padding:52px 20px 8px; max-width:var(--maxw); margin:0 auto;}
+  .cross-promo h3{
+    font-size:.95rem; color:var(--text-dim); text-align:center;
+    margin-bottom:16px; font-weight:600; text-transform:uppercase; letter-spacing:.04em;
+  }
+  .cross-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px;}
+  @media (max-width:700px){ .cross-grid{grid-template-columns:1fr;} }
+  .cross-card{
+    display:flex; gap:12px; align-items:center; text-decoration:none;
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:16px; transition:.2s;
+  }
+  .cross-card:hover{border-color:var(--accent2); transform:translateY(-2px);}
+  .cross-card .emoji{font-size:1.7rem; flex:0 0 auto;}
+  .cross-card h4{margin:0 0 2px; font-size:.92rem; color:var(--text);}
+  .cross-card p{margin:0; font-size:.83rem; color:var(--accent2); font-weight:700;}
+
+  [hidden]{display:none!important;}
+
+  /* ---------- Footer / back to top ---------- */
+  footer{padding:40px 0 90px; text-align:center; color:var(--text-dim); font-size:.85rem;}
+  #back-to-top{
+    position:fixed; right:18px; bottom:18px; z-index:200;
+    width:48px; height:48px; border-radius:50%;
+    background:var(--accent2); color:var(--bg); border:none;
+    font-size:1.3rem; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.4);
+    opacity:0; pointer-events:none; transition:.25s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #back-to-top.show{opacity:1; pointer-events:auto;}
+</style>
+</head>
+<body>
+
+<div class="site-nav">
+  <div class="site-nav-inner">
+    <a class="site-brand" href="index.html"><span class="dot"></span>TechEd Fiji</a>
+    <nav class="site-links" aria-label="Site pages">
+      <a href="index.html">☁️ Cloud Computing</a>
+      <a href="networking.html">📡 Networking</a>
+      <a href="cybersecurity.html">🔐 Cybersecurity</a>
+      <a href="cloud-in-action.html">🕰️ Cloud in Action</a>
+      <a href="network-model.html" class="current">🧩 Network Model</a>
+    </nav>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <nav class="toc" id="tocNav" aria-label="Section navigation">
+      <a href="#overview">Overview</a>
+      <a href="#core-edge">Core &amp; Edge</a>
+      <a href="#user-zones">User Zones</a>
+      <a href="#server-dmz">Servers &amp; DMZ</a>
+      <a href="#topology">Topology</a>
+      <a href="#why-it-matters">Why it Matters</a>
+    </nav>
+  </div>
+</div>
+
+<div class="intro-strip">
+  <div class="wrap">
+    <span>📖 <strong>What's this page?</strong> A briefing on the physical network model on display — a segmented campus network built with VLANs — jump to any section, no set order.</span>
+    <span>⏱️ <strong>~5 min read</strong>, with a clickable diagram.</span>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- 1. OVERVIEW -->
+  <section id="overview" class="hero">
+    <span class="eyebrow">🧩 Start here</span>
+    <h1>A segmented campus network, built as a physical model</h1>
+    <p class="lede">
+      This physical model shows how a campus network can be divided into separate zones
+      using <strong>VLANs</strong> (Virtual Local Area Networks). Each zone gets its own
+      subnet, so different groups of users and services stay isolated from one another while
+      still sharing the same underlying infrastructure.
+    </p>
+    <p class="lede">At a glance:</p>
+    <div class="app-grid">
+      <div class="app-chip"><span class="emoji">🔀</span>1 Core</div>
+      <div class="app-chip"><span class="emoji">🧯</span>1 Edge / Firewall</div>
+      <div class="app-chip"><span class="emoji">🧑‍🤝‍🧑</span>4 User VLANs</div>
+      <div class="app-chip"><span class="emoji">🗄️</span>1 Server VLAN</div>
+      <div class="app-chip"><span class="emoji">⬛</span>1 DMZ</div>
+    </div>
+  </section>
+
+  <!-- 2. CORE & EDGE -->
+  <section id="core-edge">
+    <span class="eyebrow">🔀 The centre of it all</span>
+    <h2 class="section-title">The core and the edge</h2>
+    <p class="lede">Two devices make everything else in the model possible.</p>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tag tag-a">Core</span>
+        <h3>Core switch / router</h3>
+        <p>At the centre of the model is the core device — shown as the red cylinder. It connects every zone and routes traffic between them.</p>
+        <div class="examples">📌 Without it, the VLANs could not talk to each other at all.</div>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-d">Edge</span>
+        <h3>Edge / firewall</h3>
+        <p>The foil-wrapped round object represents the network edge — the firewall and gateway to the outside world.</p>
+        <div class="examples">📌 Every byte entering or leaving the campus network passes through here first.</div>
+      </div>
+    </div>
+    <div class="analogy-card">
+      <h3>Think of it like a building's front door and hallway 🚪</h3>
+      <p>
+        The edge is the front door — it decides what's allowed in or out. The core is the
+        main hallway inside — once you're past the door, it's what connects every room
+        (VLAN) to every other room.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. USER ZONES -->
+  <section id="user-zones">
+    <span class="eyebrow">🧑‍🤝‍🧑 Keeping groups apart</span>
+    <h2 class="section-title">User zones</h2>
+    <p class="lede">Each zone below has two workstations in the model, shown as a PC tower, monitor, and keyboard.</p>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tag tag-a">VLAN 10</span>
+        <h3>Student VLAN</h3>
+        <p>Subnet 1. Devices used by students, kept on their own subnet so their traffic can't reach staff systems directly.</p>
+        <p class="footnote">🖥️🖥️ 2 workstations in the model</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-b">VLAN 20</span>
+        <h3>Subnet 2</h3>
+        <p>A further user group, isolated on its own subnet and VLAN even though it shares the same physical switch as everyone else.</p>
+        <p class="footnote">🖥️🖥️ 2 workstations in the model</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-c">VLAN 30</span>
+        <h3>Staff VLAN</h3>
+        <p>Subnet 3. Devices used by staff, separated from student traffic so staff systems and files stay protected.</p>
+        <p class="footnote">🖥️🖥️ 2 workstations in the model</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-d">VLAN 40</span>
+        <h3>Subnet 4</h3>
+        <p>A further user group, each with its own subnet and VLAN so a problem in one zone doesn't spread to the others.</p>
+        <p class="footnote">🖥️🖥️ 2 workstations in the model</p>
+      </div>
+    </div>
+    <p class="lede" style="margin-top:20px;">
+      Separating students from staff keeps student traffic away from staff systems and lets
+      each group have its own access rules.
+    </p>
+  </section>
+
+  <!-- 4. SERVERS & DMZ -->
+  <section id="server-dmz">
+    <span class="eyebrow">🗄️ Shared services</span>
+    <h2 class="section-title">The server VLAN, and the DMZ around it</h2>
+    <p class="lede">The server zone, shown on the yellow card, hosts the services the rest of the network depends on.</p>
+    <div class="type-grid">
+      <div class="type-card">
+        <span class="tag tag-a">DNS</span>
+        <h3>DNS server</h3>
+        <p>Translates names into IP addresses, so devices can find each other by name instead of a string of numbers.</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-b">DHCP</span>
+        <h3>DHCP server</h3>
+        <p>Hands out IP addresses automatically to devices as they join a VLAN.</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-c">Web</span>
+        <h3>Web server</h3>
+        <p>Hosts websites that people — inside or outside the network — can browse to.</p>
+      </div>
+      <div class="type-card">
+        <span class="tag tag-d">Email</span>
+        <h3>Email server</h3>
+        <p>Handles sending and receiving mail for the organisation.</p>
+      </div>
+    </div>
+    <div class="cable-note">
+      <span class="emoji">⬛</span>
+      <div>
+        <strong>The DMZ (demilitarised zone)</strong>
+        <p style="margin:6px 0 0;">
+          In the model, the black arch over the servers marks the DMZ. Public-facing
+          services such as web and email sit here so outside users can reach them without
+          getting direct access to the internal network — it's a buffer zone between the
+          open internet and everything else.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. TOPOLOGY (CLICKABLE) -->
+  <section id="topology">
+    <span class="eyebrow">🗺️ See it together</span>
+    <h2 class="section-title">How it all connects</h2>
+    <p class="lede">The same model, laid out as a map. Tap any box to see what it does.</p>
+    <div class="trace-hint">
+      <span>👆 Tap any device or zone in the diagram below — swipe sideways if it doesn't fit your screen</span>
+    </div>
+    <div class="topology-wrap">
+      <svg viewBox="0 0 1000 390" role="img" aria-label="Network topology diagram: internet connects to edge firewall, which connects to the core switch, which connects to four user VLANs and a server VLAN inside a DMZ">
+        <text x="500" y="20" text-anchor="middle" font-size="15" fill="var(--text-dim)">☁️ Internet</text>
+        <line class="topo-line" x1="500" y1="32" x2="500" y2="66"/>
+
+        <g class="topo-hit" id="node-edge" tabindex="0" role="button" aria-label="Edge / Firewall">
+          <rect x="400" y="66" width="200" height="50" rx="12" fill="var(--card-alt)" stroke="var(--accent4)" stroke-width="2"/>
+          <text x="500" y="88" text-anchor="middle" font-size="14" class="topo-label-title">🧯 Edge / Firewall</text>
+          <text x="500" y="105" text-anchor="middle" font-size="10.5" class="topo-label-sub">Gateway to the internet</text>
+        </g>
+
+        <line class="topo-line" x1="500" y1="116" x2="500" y2="150"/>
+
+        <g class="topo-hit" id="node-core" tabindex="0" role="button" aria-label="Core switch or router">
+          <rect x="390" y="150" width="220" height="58" rx="12" fill="var(--card-alt)" stroke="var(--accent)" stroke-width="2.5"/>
+          <text x="500" y="174" text-anchor="middle" font-size="14" class="topo-label-title">🔀 Core Switch / Router</text>
+          <text x="500" y="192" text-anchor="middle" font-size="10.5" class="topo-label-sub">Routes traffic between every VLAN</text>
+        </g>
+
+        <line class="topo-line" x1="500" y1="208" x2="500" y2="240"/>
+        <line class="topo-line" x1="115" y1="240" x2="885" y2="240"/>
+        <line class="topo-line" x1="115" y1="240" x2="115" y2="270"/>
+        <line class="topo-line" x1="308" y1="240" x2="308" y2="270"/>
+        <line class="topo-line" x1="500" y1="240" x2="500" y2="270"/>
+        <line class="topo-line" x1="693" y1="240" x2="693" y2="270"/>
+        <line class="topo-line" x1="885" y1="240" x2="885" y2="270"/>
+
+        <g class="topo-hit" id="node-vlan10" tabindex="0" role="button" aria-label="Student VLAN, VLAN 10, Subnet 1">
+          <rect x="40" y="270" width="150" height="86" rx="12" fill="var(--card)" stroke="var(--accent2)" stroke-width="2"/>
+          <text x="115" y="296" text-anchor="middle" font-size="13" class="topo-label-title">Student VLAN</text>
+          <text x="115" y="314" text-anchor="middle" font-size="10.5" class="topo-label-sub">VLAN 10 · Subnet 1</text>
+          <text x="115" y="338" text-anchor="middle" font-size="16">🖥️🖥️</text>
+        </g>
+
+        <g class="topo-hit" id="node-vlan20" tabindex="0" role="button" aria-label="VLAN 20, Subnet 2">
+          <rect x="233" y="270" width="150" height="86" rx="12" fill="var(--card)" stroke="var(--accent3)" stroke-width="2"/>
+          <text x="308" y="296" text-anchor="middle" font-size="13" class="topo-label-title">VLAN 20</text>
+          <text x="308" y="314" text-anchor="middle" font-size="10.5" class="topo-label-sub">Subnet 2</text>
+          <text x="308" y="338" text-anchor="middle" font-size="16">🖥️🖥️</text>
+        </g>
+
+        <g class="topo-hit" id="node-vlan30" tabindex="0" role="button" aria-label="Staff VLAN, VLAN 30, Subnet 3">
+          <rect x="425" y="270" width="150" height="86" rx="12" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="500" y="296" text-anchor="middle" font-size="13" class="topo-label-title">Staff VLAN</text>
+          <text x="500" y="314" text-anchor="middle" font-size="10.5" class="topo-label-sub">VLAN 30 · Subnet 3</text>
+          <text x="500" y="338" text-anchor="middle" font-size="16">🖥️🖥️</text>
+        </g>
+
+        <g class="topo-hit" id="node-vlan40" tabindex="0" role="button" aria-label="VLAN 40, Subnet 4">
+          <rect x="618" y="270" width="150" height="86" rx="12" fill="var(--card)" stroke="var(--accent4)" stroke-width="2"/>
+          <text x="693" y="296" text-anchor="middle" font-size="13" class="topo-label-title">VLAN 40</text>
+          <text x="693" y="314" text-anchor="middle" font-size="10.5" class="topo-label-sub">Subnet 4</text>
+          <text x="693" y="338" text-anchor="middle" font-size="16">🖥️🖥️</text>
+        </g>
+
+        <rect class="topo-dmz" x="800" y="260" width="170" height="106" rx="16"/>
+        <text x="885" y="250" text-anchor="middle" font-size="11" class="topo-dmz-label">DMZ</text>
+        <g class="topo-hit" id="node-servers" tabindex="0" role="button" aria-label="Server VLAN inside the DMZ">
+          <rect x="810" y="270" width="150" height="86" rx="12" fill="var(--card)" stroke="var(--accent3)" stroke-width="2"/>
+          <text x="885" y="292" text-anchor="middle" font-size="12.5" class="topo-label-title">Server VLAN</text>
+          <text x="885" y="308" text-anchor="middle" font-size="9.5" class="topo-label-sub">DNS · DHCP</text>
+          <text x="885" y="322" text-anchor="middle" font-size="9.5" class="topo-label-sub">Web · Email</text>
+        </g>
+      </svg>
+    </div>
+    <div class="trace-panel" id="topoPanel">
+      <span class="trace-step-num" id="topoLabel">Tap to explore</span>
+      <h3 id="topoTitle">Start anywhere</h3>
+      <p id="topoDesc">Tap any device or zone in the diagram above — edge, core, a VLAN, or the servers — to see what it does.</p>
+    </div>
+  </section>
+
+  <!-- 6. WHY IT MATTERS -->
+  <section id="why-it-matters">
+    <span class="eyebrow">💡 Why it matters</span>
+    <h2 class="section-title">Why bother segmenting the network?</h2>
+    <div class="benefit-grid">
+      <div class="benefit"><span class="emoji">🔒</span><h4>Security</h4><p>A problem in one VLAN is contained instead of spreading everywhere.</p></div>
+      <div class="benefit"><span class="emoji">⚡</span><h4>Performance</h4><p>Broadcast traffic stays within each zone instead of flooding the whole network.</p></div>
+      <div class="benefit"><span class="emoji">🎛️</span><h4>Control</h4><p>Policies can be set per group, such as who can reach the servers.</p></div>
+      <div class="benefit"><span class="emoji">📈</span><h4>Scalability</h4><p>New zones can be added without redesigning the whole network.</p></div>
+    </div>
+    <div class="cable-note">
+      <span class="emoji">📝</span>
+      <div>
+        <strong>A note on this briefing</strong>
+        <p style="margin:6px 0 0;">
+          The photos of the physical model don't label the red core device, the foil-wrapped
+          edge object, or exactly which servers sit in the DMZ — and VLANs 20 and 40 have no
+          zone names. This page describes the most likely design based on the model's layout.
+          Adjust any of these details to match the actual plan, and add IP ranges for each
+          subnet if you'd like them shown here too.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="cross-promo">
+  <h3>Keep exploring the site</h3>
+  <div class="cross-grid">
+    <a class="cross-card" href="index.html">
+      <span class="emoji">☁️</span>
+      <div><h4>New to cloud computing basics?</h4><p>Check out Cloud Computing →</p></div>
+    </a>
+    <a class="cross-card" href="networking.html">
+      <span class="emoji">📡</span>
+      <div><h4>Want the fundamentals of how networks work?</h4><p>Check out Networking →</p></div>
+    </a>
+    <a class="cross-card" href="cybersecurity.html">
+      <span class="emoji">🔐</span>
+      <div><h4>Want to know how to stay safe online?</h4><p>Check out Cybersecurity →</p></div>
+    </a>
+    <a class="cross-card" href="cloud-in-action.html">
+      <span class="emoji">🕰️</span>
+      <div><h4>Curious where cloud computing came from?</h4><p>Check out Cloud in Action →</p></div>
+    </a>
+  </div>
+</div>
+
+<footer>
+  Built for Year 11–13 students exploring network design • Fiji 🇫🇯
+</footer>
+
+<button id="back-to-top" aria-label="Back to top">↑</button>
+
+<script>
+(function(){
+  // ---- Stack sticky headers (site nav + in-page nav) ----
+  function stackHeaders(){
+    const siteNav = document.querySelector('.site-nav');
+    const pageNav = document.querySelector('.topbar');
+    if (!siteNav || !pageNav) return;
+    const h1 = siteNav.offsetHeight;
+    pageNav.style.top = h1 + 'px';
+    document.documentElement.style.setProperty('--stack-h', (h1 + pageNav.offsetHeight) + 'px');
+  }
+  stackHeaders();
+  window.addEventListener('resize', stackHeaders);
+
+  // ---- Scrollspy ----
+  const navLinks = Array.from(document.querySelectorAll('#tocNav a'));
+  const sections = navLinks.map(a => document.querySelector(a.getAttribute('href')));
+  function setActive(id){
+    navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+  }
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+  sections.forEach(s => s && spy.observe(s));
+
+  // ---- Back to top ----
+  const backBtn = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    backBtn.classList.toggle('show', window.scrollY > 500);
+  });
+  backBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+  // ---- Clickable topology diagram ----
+  const topoData = {
+    'node-edge': { label: 'Edge / Firewall', icon: '🧯', title: 'Edge / Firewall', desc: "Represented by the foil-wrapped round object in the model. This is the gateway to the outside world — it filters traffic entering or leaving the campus network before anything reaches the internal VLANs." },
+    'node-core': { label: 'Core', icon: '🔀', title: 'Core Switch / Router', desc: "The red cylinder at the centre of the model. It connects every VLAN and routes traffic between them — without it, the VLANs could not talk to each other at all." },
+    'node-vlan10': { label: 'VLAN 10', icon: '🎓', title: 'Student VLAN — VLAN 10, Subnet 1', desc: "Two workstations for student use. Kept on its own subnet so student traffic can't reach staff systems or servers directly." },
+    'node-vlan20': { label: 'VLAN 20', icon: '👥', title: 'VLAN 20 — Subnet 2', desc: "A further user group, isolated on its own subnet and VLAN even though it shares the same physical switch as everyone else." },
+    'node-vlan30': { label: 'VLAN 30', icon: '🧑‍💼', title: 'Staff VLAN — VLAN 30, Subnet 3', desc: "Two workstations for staff use, separated from student traffic so staff systems and files stay protected." },
+    'node-vlan40': { label: 'VLAN 40', icon: '👥', title: 'VLAN 40 — Subnet 4', desc: "Another isolated user group, each with its own subnet and VLAN so a problem in one zone doesn't spread to the others." },
+    'node-servers': { label: 'Server VLAN', icon: '🗄️', title: 'Server VLAN (inside the DMZ)', desc: "Hosted on the yellow card: a DNS server, DHCP server, web server, and email server. Public-facing services sit in the DMZ so outside users can reach them without getting direct access to the internal network." },
+  };
+
+  const topoLabelEl = document.getElementById('topoLabel');
+  const topoTitleEl = document.getElementById('topoTitle');
+  const topoDescEl = document.getElementById('topoDesc');
+  const topoNodes = Array.from(document.querySelectorAll('.topo-hit'));
+
+  function selectNode(id){
+    const info = topoData[id];
+    if (!info) return;
+    topoNodes.forEach(n => n.classList.toggle('active', n.id === id));
+    topoLabelEl.textContent = info.label;
+    topoTitleEl.textContent = `${info.icon} ${info.title}`;
+    topoDescEl.textContent = info.desc;
+  }
+
+  topoNodes.forEach(node => {
+    node.addEventListener('click', () => selectNode(node.id));
+    node.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectNode(node.id); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
