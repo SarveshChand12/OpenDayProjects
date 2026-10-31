@@ -18,6 +18,14 @@
     pdfPage: null,
   };
 
+  // ------------------------------------------------------------ event hub
+  // Feature modules subscribe with OC.on("compiled", fn) etc.
+  const listeners = {};
+  function on(evt, fn) { (listeners[evt] = listeners[evt] || []).push(fn); }
+  function emit(evt, ...args) {
+    (listeners[evt] || []).forEach((fn) => { try { fn(...args); } catch (e) { console.error(evt, e); } });
+  }
+
   async function api(method, url, body, isForm) {
     const opts = { method, headers: {} };
     if (body !== undefined) {
@@ -288,6 +296,7 @@
     updateWordCount();
     // Show an existing PDF straight away if one was built before.
     fetch(`/api/projects/${enc(name)}/pdf`, { method: "HEAD" }).then((r) => { if (r.ok) showPdf(); });
+    emit("projectOpened", name);
   }
 
   async function refreshTree() {
@@ -297,6 +306,7 @@
     $("#engineSelect").value = data.settings.engine || "pdflatex";
     renderMainSelect();
     renderTree();
+    emit("treeRefreshed", state.tree);
   }
 
   function allFiles(nodes = state.tree, out = []) {
@@ -585,6 +595,7 @@
     renderTabs();
     renderTree();
     refreshOutline();
+    emit("tabActivated", tab);
   }
 
   function renderTabs() {
@@ -654,6 +665,7 @@
       await api("PUT", `/api/projects/${enc(state.project)}/file`, { path: tab.path, content });
       // Only mark clean if nothing was typed while the request was in flight.
       if (tab.doc.isClean(gen)) tab.dirty = false;
+      emit("saved", tab);
       setSaveStatus("Saved " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
     } catch (e) {
       setSaveStatus("⚠ Save failed");
@@ -695,6 +707,7 @@
       state.issues = r.issues || [];
       renderIssues(r);
       markIssuesInEditor();
+      emit("compiled", r);
       if (r.pdf) {
         const page = await cursorPdfPage();
         showPdf(page);
@@ -893,12 +906,138 @@
     }
   });
 
+  // ------------------------------------------------- sidebar panels
+  function addPanel(id, icon, title, el) {
+    const btn = document.createElement("button");
+    btn.dataset.panel = id; btn.textContent = icon; btn.title = title;
+    $("#sidebarTabs").appendChild(btn);
+    const wrap = document.createElement("div");
+    wrap.className = "side-panel"; wrap.dataset.panel = id; wrap.hidden = true;
+    const head = document.createElement("div");
+    head.className = "panel-head"; head.innerHTML = "<span></span>";
+    head.firstChild.textContent = title;
+    wrap.appendChild(head);
+    wrap.appendChild(el);
+    $("#sidebar").appendChild(wrap);
+    return wrap;
+  }
+  function showPanel(id) {
+    document.querySelectorAll("#sidebarTabs button").forEach((b) => b.classList.toggle("active", b.dataset.panel === id));
+    document.querySelectorAll(".side-panel").forEach((p) => (p.hidden = p.dataset.panel !== id));
+    emit("panelShown", id);
+  }
+  $("#sidebarTabs").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (b) showPanel(b.dataset.panel);
+  });
+
+  // ---------------------------------------------------------- tools menu
+  const toolGroups = [];
+  function addTool(label, fn, group = "Tools") {
+    toolGroups.push({ label, fn, group });
+  }
+  $("#toolsBtn").onclick = (e) => {
+    e.stopPropagation();
+    const menu = $("#toolsMenu");
+    if (!menu.hidden) { menu.hidden = true; return; }
+    menu.innerHTML = "";
+    let lastGroup = null;
+    toolGroups.forEach((t) => {
+      if (t.group !== lastGroup) {
+        const h = document.createElement("div"); h.className = "menu-group"; h.textContent = t.group;
+        menu.appendChild(h); lastGroup = t.group;
+      }
+      const d = document.createElement("div"); d.className = "menu-item"; d.textContent = t.label;
+      d.onclick = () => { menu.hidden = true; t.fn(); };
+      menu.appendChild(d);
+    });
+    menu.hidden = false;
+  };
+  document.addEventListener("click", () => { $("#toolsMenu").hidden = true; });
+
+  // --------------------------------------------------------------- modal
+  // OC.modal({title, body: Node|string, buttons: [{label, primary, onClick(close)}], wide})
+  function modal({ title, body, buttons = [], wide = false, onClose }) {
+    const back = document.createElement("div");
+    back.className = "modal-backdrop";
+    const box = document.createElement("div");
+    box.className = "modal" + (wide ? " wide" : "");
+    box.innerHTML = '<div class="modal-head"><span></span><button class="modal-x" title="Close">×</button></div><div class="modal-body"></div><div class="modal-foot"></div>';
+    box.querySelector(".modal-head span").textContent = title;
+    const bodyEl = box.querySelector(".modal-body");
+    if (typeof body === "string") bodyEl.innerHTML = body; else if (body) bodyEl.appendChild(body);
+    const close = () => { back.remove(); document.removeEventListener("keydown", esc); if (onClose) onClose(); };
+    const esc = (e) => { if (e.key === "Escape") close(); };
+    document.addEventListener("keydown", esc);
+    box.querySelector(".modal-x").onclick = close;
+    back.addEventListener("mousedown", (e) => { if (e.target === back) close(); });
+    const foot = box.querySelector(".modal-foot");
+    buttons.forEach((b) => {
+      const btn = document.createElement("button");
+      btn.className = "btn" + (b.primary ? " primary" : "");
+      btn.textContent = b.label;
+      btn.onclick = () => b.onClick(close, btn);
+      foot.appendChild(btn);
+    });
+    if (!buttons.length) foot.remove();
+    back.appendChild(box);
+    $("#modalRoot").appendChild(back);
+    return { close, body: bodyEl, box };
+  }
+
+  function el(html) {
+    const t = document.createElement("template");
+    t.innerHTML = html.trim();
+    return t.content.firstElementChild;
+  }
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  async function gotoLine(path, line, ch = 0) {
+    await openFile(path);
+    if (line) {
+      const ln = line - 1;
+      editor.setCursor({ line: ln, ch });
+      editor.scrollIntoView({ line: ln, ch }, 120);
+      editor.focus();
+    }
+  }
+
+  async function reloadOpenTabs() {
+    for (const t of state.openTabs) {
+      if (t.binary || t.dirty) continue;
+      try {
+        const data = await api("GET", `/api/projects/${enc(state.project)}/file?path=${enc(t.path)}`);
+        if (data.content !== t.doc.getValue()) {
+          const cur = t.doc.getCursor();
+          t.doc.setValue(data.content);
+          t.doc.setCursor(cur);
+          t.doc.markClean();
+          t.dirty = false;
+        }
+      } catch (_) { /* file may have been removed */ }
+    }
+    renderTabs();
+  }
+
+  // Public API for feature modules.
+  window.OC = {
+    state, api, enc, toast, debounce, on, emit, modal, el, escapeHtml,
+    addPanel, showPanel, addTool,
+    get editor() { return editor; },
+    activeTab, openFile, gotoLine, refreshTree, reloadOpenTabs, saveAll, compile,
+    showPdf, showLogs, switchPreview, allFiles, findNode, currentFolder, uploadFiles,
+    projectUrl: (suffix = "") => `/api/projects/${enc(state.project)}${suffix}`,
+  };
+
   // ------------------------------------------------------------- startup
   applyTheme(localStorage.getItem("oc-dark") === "1");
+  window.addEventListener("DOMContentLoaded", () => {
+  emit("init");
   const params = new URLSearchParams(location.search);
   if (params.get("project")) {
     openProject(params.get("project")).catch((e) => { toast(e.message, true); loadDashboard(); });
   } else {
     loadDashboard().catch((e) => toast("Could not reach the server: " + e.message, true));
   }
+  });
 })();

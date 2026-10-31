@@ -69,12 +69,20 @@
     </div>
     <a id="downloadPdf" class="btn" title="Download PDF">⤓ PDF</a>
     <a id="downloadZip" class="btn" title="Download project as .zip">⤓ Zip</a>
+    <div class="dropdown">
+      <button id="toolsBtn" class="btn" title="Tools">🛠 Tools ▾</button>
+      <div id="toolsMenu" class="menu" hidden></div>
+    </div>
     <button id="themeToggle" class="btn ghost" title="Toggle dark mode">☾ Theme</button>
   </header>
 
   <div class="workspace" id="workspace">
     <!-- File tree + outline -->
     <aside class="sidebar" id="sidebar">
+      <nav id="sidebarTabs" class="sidebar-tabs">
+        <button data-panel="files" class="active" title="Files &amp; outline">📁</button>
+      </nav>
+      <div class="side-panel" data-panel="files">
       <div class="panel-head">
         <span>Files</span>
         <div class="icons">
@@ -87,6 +95,7 @@
       <div id="fileTree" class="file-tree"></div>
       <div class="panel-head"><span>Outline</span></div>
       <div id="outline" class="outline"></div>
+      </div>
     </aside>
     <div class="gutter" data-resize="sidebar"></div>
 
@@ -128,6 +137,7 @@
 </div>
 
 <div id="toast" class="toast" hidden></div>
+<div id="modalRoot"></div>
 
 <script src="/static/vendor/codemirror/codemirror.js"></script>
 <script src="/static/vendor/codemirror/stex.js"></script>
@@ -142,5 +152,7 @@
 <script src="/static/vendor/codemirror/show-hint.js"></script>
 <script src="/static/latex-hints.js"></script>
 <script src="/static/app.js"></script>
+<!-- Feature modules: each registers itself through window.OC -->
+<!--FEATURES-->
 </body>
 </html>
