@@ -680,7 +680,12 @@
     for (const t of state.openTabs) if (t.dirty) await saveTab(t);
   }
   const autosave = debounce(() => saveAll().then(() => refreshKeysDebounced()).catch(() => {}), 800);
-  const autoCompile = debounce(() => compile(), 2500);
+  let autoCompileTimer;
+  const autoCompile = () => {
+    clearTimeout(autoCompileTimer);
+    const delay = (window.OC && OC.settings && OC.settings.get().autoCompileDelay) || 2500;
+    autoCompileTimer = setTimeout(() => compile(), delay);
+  };
   window.addEventListener("beforeunload", (e) => {
     if (state.openTabs.some((t) => t.dirty)) { saveAll(); e.preventDefault(); e.returnValue = ""; }
   });
