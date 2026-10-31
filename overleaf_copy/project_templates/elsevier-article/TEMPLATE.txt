@@ -1,0 +1,1 @@
+Elsevier journal article (elsarticle class) with numbered references.

@@ -44,6 +44,8 @@
       "Replace it with a LaTeX command (– → --, “ ” → `` ''), or switch the engine to XeLaTeX/LuaLaTeX."],
     [/I can't write on file|Permission denied/, "LaTeX couldn't write an output file.", "Close the PDF in other programs (Windows locks open files) and recompile, or use ⟲ to clean the build."],
     [/Emergency stop|Fatal error occurred, no output PDF/, "LaTeX stopped early because of the error above.", "Fix the first error in the list — later ones are often consequences of it."],
+    [/auto expansion is only possible with scalable fonts|You do not have the (\S+) package installed/, "A font package the document class needs isn't installed.",
+      "Install it (e.g. acmart needs libertine and newtx: tlmgr install libertine newtx, or the texlive-fonts-extra package on Linux) and recompile."],
     [/LaTeX Error: Can be used only in preamble/, "A command that belongs before \\begin{document} is used after it.", "Move it (e.g. \\usepackage) into the preamble."],
     [/Option clash for package (\S+)/, "A package is loaded twice with different options.", "Load it once, or use \\PassOptionsToPackage{…}{pkg} before \\documentclass."],
     [/No \\author given/, "\\maketitle was used without \\author.", "Add \\author{…} to the preamble (or \\author{} for none)."],

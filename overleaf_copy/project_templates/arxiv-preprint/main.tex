@@ -1,0 +1,53 @@
+\pdfoutput=1   % tells arXiv to use pdfLaTeX
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[numbers]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=green!40!black,urlcolor=blue!60!black]{hyperref}
+\usepackage[capitalise]{cleveref}
+
+\title{Your Preprint Title}
+\author{
+  First Author\textsuperscript{1}\thanks{Correspondence: \texttt{first@example.com}} \and
+  Second Author\textsuperscript{2} \\[4pt]
+  \small \textsuperscript{1}University \quad \textsuperscript{2}Company
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+One-paragraph summary of the paper.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+Motivation and contributions; see \cref{sec:method}. Prior work includes~\citet{knuth1984}.
+
+\section{Method}
+\label{sec:method}
+\begin{equation}
+  y = f(x; \theta)
+  \label{eq:model}
+\end{equation}
+\Cref{eq:model} defines the model.
+
+\section{Experiments}
+\label{sec:experiments}
+
+\section{Conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\section{Additional results}
+
+\end{document}

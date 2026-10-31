@@ -1,0 +1,1 @@
+Springer Lecture Notes in Computer Science (llncs class). If llncs.cls is missing, download it from Springer's LNCS author page into this project.

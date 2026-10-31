@@ -291,3 +291,37 @@ mark { background: #ffe58a; color: #000; border-radius: 2px; }
 .tbl-preview table { border-collapse: collapse; }
 .tbl-preview th, .tbl-preview td { border: 1px solid var(--border); padding: 3px 8px; font-size: 12px; }
 .tbl-code { max-height: 260px; margin: 0; }
+/* ---------- Writing stats ---------- */
+.goal-chip { font-size: 12px; padding: 3px 8px; border-radius: 12px; background: #2b3942; color: var(--topbar-text); cursor: pointer; white-space: nowrap; }
+.goal-chip.urgent { background: #8a2d22; }
+.goal-chip.done { background: #136b42; }
+.stat-tiles { display: flex; gap: 12px; flex-wrap: wrap; }
+.stat { flex: 1; min-width: 160px; background: var(--panel-2); border-radius: 8px; padding: 12px 14px; }
+.stat .num { font-size: 28px; font-weight: 700; color: var(--text); }
+.stat .lbl { color: var(--muted); font-size: 12px; }
+.progress { height: 8px; background: var(--panel-2); border-radius: 4px; margin: 10px 0; overflow: hidden; }
+.progress div { height: 100%; background: var(--viz-series); border-radius: 4px; }
+.viz-title { font-size: 14px; margin: 18px 0 6px; }
+.viz-wrap { position: relative; --viz-series: #138a52; }
+body.dark .viz-wrap, body.dark .progress, body.dark .sec-bar { --viz-series: #2e9c68; }
+:root { --viz-series: #138a52; }
+body.dark { --viz-series: #2e9c68; }
+.viz { width: 100%; height: auto; display: block; }
+.viz-grid { stroke: var(--border); stroke-width: 1; }
+.viz-baseline { stroke: var(--muted); stroke-width: 1; }
+.viz-axis { fill: var(--muted); font-size: 10px; }
+.viz-bar { fill: var(--viz-series); }
+.viz-goal { stroke: var(--text); stroke-width: 1; stroke-dasharray: 4 3; opacity: .55; }
+.viz-hit { fill: transparent; cursor: default; outline: none; }
+.viz-hit.active, .viz-hit:focus { fill: rgba(127,127,127,.10); }
+.viz-tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.15); width: 150px; }
+.viz-tip strong { display: block; font-size: 14px; color: var(--text); }
+.viz-tip div { color: var(--muted); }
+.sec-bar { height: 8px; background: var(--viz-series); border-radius: 0 4px 4px 0; min-width: 2px; }
+tr.clickable:hover td { background: var(--panel-2); cursor: pointer; }
+/* ---------- Notes ---------- */
+.note-gutter { width: 18px; }
+.note-marker { cursor: pointer; font-size: 11px; line-height: 1.6; text-align: center; }
+.CodeMirror-gutter-wrapper .note-marker:hover { transform: scale(1.2); }
+.list-item.resolved .note-text { text-decoration: line-through; color: var(--muted); }
+.note-text { white-space: pre-wrap; }

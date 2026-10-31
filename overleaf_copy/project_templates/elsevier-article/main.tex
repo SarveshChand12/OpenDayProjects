@@ -1,0 +1,60 @@
+\documentclass[preprint,12pt]{elsarticle}
+%% For the final two-column look use: \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\journal{Journal Name}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Your Article Title}
+
+\author[inst1]{First Author\corref{cor1}}
+\ead{first@example.com}
+\cortext[cor1]{Corresponding author}
+\author[inst2]{Second Author}
+
+\affiliation[inst1]{organization={Department, University},
+            city={City},
+            country={Country}}
+\affiliation[inst2]{organization={Institute},
+            city={City},
+            country={Country}}
+
+\begin{abstract}
+Summarise the problem, methods, results and conclusions.
+\end{abstract}
+
+\begin{keyword}
+keyword one \sep keyword two \sep keyword three
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Introduction}
+\label{sec:intro}
+Introduce the work and cite prior studies~\cite{knuth1984}.
+
+\section{Materials and methods}
+Describe what you did.
+
+\section{Results}
+Present your findings.
+
+\section{Discussion}
+Interpret them.
+
+\section{Conclusions}
+Summarise.
+
+\section*{Acknowledgements}
+Funding information.
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+
+\end{document}

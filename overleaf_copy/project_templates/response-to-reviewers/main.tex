@@ -1,0 +1,48 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+%% Reviewer comments in a grey box, responses in normal text, quoted changes in blue.
+\definecolor{revbg}{gray}{0.93}
+\newcounter{comment}[section]
+\newcommand{\reviewer}[1]{\section*{Reviewer #1}\setcounter{comment}{0}}
+\newcommand{\comment}[1]{\stepcounter{comment}\par\medskip\noindent
+  \colorbox{revbg}{\parbox{\dimexpr\linewidth-2\fboxsep}{\textbf{Comment \arabic{comment}.} #1}}\par\smallskip}
+\newcommand{\response}[1]{\noindent\textbf{Response:} #1\par}
+\newcommand{\change}[1]{\begin{quote}\color{blue!60!black}#1\end{quote}}
+
+\begin{document}
+
+\begin{flushleft}
+Manuscript ID: XXXX-2027-0001\\
+Title: \emph{Your Paper Title}\\
+\today
+\end{flushleft}
+
+Dear Editor,
+
+We thank you and the reviewers for the constructive feedback. We have revised the manuscript
+accordingly; all changes are highlighted in the accompanying changes PDF
+(Tools → Changes PDF since a version). Below we respond to each comment in turn.
+
+Sincerely,\\
+The authors
+
+\reviewer{1}
+
+\comment{The motivation in the introduction is unclear.}
+\response{We agree and have rewritten the first two paragraphs of Section~1 (page 2):}
+\change{New text quoted from the revised manuscript.}
+
+\comment{Please compare with a stronger baseline.}
+\response{We added a comparison with Method X (Table~2).}
+
+\reviewer{2}
+
+\comment{Minor: typo on page 5.}
+\response{Fixed, thank you.}
+
+\end{document}

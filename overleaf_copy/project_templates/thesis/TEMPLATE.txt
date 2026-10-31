@@ -1,0 +1,1 @@
+Thesis / dissertation (report class): title page, abstract, acknowledgements, table of contents, chapters in separate files, appendix and bibliography.

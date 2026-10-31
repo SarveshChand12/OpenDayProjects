@@ -1,0 +1,61 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm,bindingoffset=0.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[numbers]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+\onehalfspacing
+
+\begin{document}
+
+%% ---------------- Title page ----------------
+\begin{titlepage}
+  \centering
+  {\Large University Name\par}
+  \vspace{2cm}
+  {\huge\bfseries Thesis Title\par}
+  \vspace{1.5cm}
+  {\Large Your Name\par}
+  \vfill
+  A thesis submitted in fulfilment of the requirements\\
+  for the degree of Doctor of Philosophy\par
+  \vspace{1cm}
+  Department of Something\\
+  \today
+\end{titlepage}
+
+%% ---------------- Front matter ----------------
+\pagenumbering{roman}
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Summarise the thesis.
+
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+Thank people.
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+%% ---------------- Main matter ----------------
+\clearpage
+\pagenumbering{arabic}
+\include{chapters/introduction}
+\include{chapters/background}
+\include{chapters/conclusion}
+
+\appendix
+\chapter{Supplementary material}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,1 @@
+ACM conference/journal paper (acmart class, sigconf format). Change the class option for other ACM formats (acmsmall, manuscript, …).

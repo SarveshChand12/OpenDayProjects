@@ -256,6 +256,8 @@ def api_move(name):
         return err("Destination already exists.", 409)
     dst.parent.mkdir(parents=True, exist_ok=True)
     src.rename(dst)
+    from features import notes as _notes  # keep line notes attached to the moved file
+    _notes.rename_paths(root, src.relative_to(root.resolve()).as_posix(), dst.relative_to(root.resolve()).as_posix())
     settings = load_settings(root)
     save_settings(root, settings)
     return jsonify({"moved": dst.relative_to(root).as_posix()})
