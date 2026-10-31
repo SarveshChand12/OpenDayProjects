@@ -283,3 +283,11 @@ mark { background: #ffe58a; color: #000; border-radius: 2px; }
 .cm-spell-error { text-decoration: underline wavy #d33; text-decoration-skip-ink: none; text-underline-offset: 3px; }
 .cm-grammar { border-bottom: 2px solid #2c6fbb; background: rgba(44,111,187,.08); }
 .issue .help { margin-top: 6px; padding: 6px 8px; background: var(--panel-2); border-radius: 5px; font-size: 12px; line-height: 1.45; }
+/* ---------- Insert helpers / math preview ---------- */
+.math-preview { position: fixed; z-index: 60; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,.18); overflow-x: auto; pointer-events: none; font-size: 15px; }
+.math-preview .katex-display { margin: 0; }
+.paste-offer { position: fixed; z-index: 70; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; box-shadow: 0 6px 20px rgba(0,0,0,.2); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.tbl-preview { max-height: 260px; overflow: auto; border: 1px solid var(--border); border-radius: 6px; }
+.tbl-preview table { border-collapse: collapse; }
+.tbl-preview th, .tbl-preview td { border: 1px solid var(--border); padding: 3px 8px; font-size: 12px; }
+.tbl-code { max-height: 260px; margin: 0; }
