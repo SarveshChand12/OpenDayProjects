@@ -2,7 +2,7 @@
 
 import importlib
 
-MODULES = []
+MODULES = ["history"]
 
 
 def register(app):

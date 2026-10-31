@@ -258,3 +258,8 @@ mark { background: #ffe58a; color: #000; border-radius: 2px; }
 .check-row .detail { color: var(--muted); font-size: 12px; white-space: pre-wrap; }
 .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px; background: var(--panel-2); border: 1px solid var(--border); }
 .pill.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+.diffview { font-family: var(--mono); font-size: 12px; line-height: 1.45; }
+.diffview .dl { white-space: pre-wrap; word-break: break-word; padding: 0 6px; }
+.diffview .add { background: rgba(19,138,82,.16); }
+.diffview .del { background: rgba(192,57,43,.16); text-decoration: line-through; text-decoration-color: rgba(192,57,43,.5); }
+.diffview .hunk { color: var(--info); background: var(--panel-2); margin-top: 6px; }
