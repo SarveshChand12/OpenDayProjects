@@ -282,3 +282,4 @@ mark { background: #ffe58a; color: #000; border-radius: 2px; }
 /* ---------- Proofreading ---------- */
 .cm-spell-error { text-decoration: underline wavy #d33; text-decoration-skip-ink: none; text-underline-offset: 3px; }
 .cm-grammar { border-bottom: 2px solid #2c6fbb; background: rgba(44,111,187,.08); }
+.issue .help { margin-top: 6px; padding: 6px 8px; background: var(--panel-2); border-radius: 5px; font-size: 12px; line-height: 1.45; }
