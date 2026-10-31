@@ -1,0 +1,72 @@
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Packages ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+\newtheorem{theorem}{Theorem}
+
+% ---------- Metadata ----------
+\title{A Descriptive Title for Your Paper}
+\author{
+  Your Name\thanks{Corresponding author: \texttt{you@example.com}} \\
+  Department, University \\
+}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Summarise the problem, your approach, the key results and why they matter
+in roughly 150--250 words.
+\end{abstract}
+
+\noindent\textbf{Keywords:} keyword one, keyword two, keyword three
+
+\input{sections/introduction}
+\input{sections/method}
+
+\section{Results}
+\label{sec:results}
+
+Table~\ref{tab:results} compares our approach with a baseline, and
+Figure~\ref{fig:overview} gives an overview.
+
+\begin{table}[ht]
+  \centering
+  \caption{Example results table.}
+  \label{tab:results}
+  \begin{tabular}{lcc}
+    \toprule
+    Method   & Accuracy (\%) & Time (s) \\
+    \midrule
+    Baseline & 81.2 & 12.4 \\
+    Ours     & \textbf{89.7} & \textbf{9.8} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.6\linewidth]{placeholder.png}
+  \caption{Replace \texttt{figures/placeholder.png} with your own figure.}
+  \label{fig:overview}
+\end{figure}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+State the main contributions and future work.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

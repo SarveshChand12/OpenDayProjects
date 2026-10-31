@@ -1,0 +1,6 @@
+# Your papers live here by default - remove this line if you want them in git.
+projects/
+.build/
+__pycache__/
+*.pyc
+.venv/

@@ -1,0 +1,54 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\title{Talk Title}
+\subtitle{Based on our paper}
+\author{Your Name}
+\institute{Your University}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+\section{Motivation}
+\begin{frame}{Motivation}
+  \begin{itemize}
+    \item Why this problem matters
+    \item What is missing in prior work
+  \end{itemize}
+\end{frame}
+
+\section{Results}
+\begin{frame}{Key Result}
+  \begin{columns}
+    \column{0.5\textwidth}
+      \begin{block}{Finding}
+        Our method improves accuracy by 8.5 points.
+      \end{block}
+    \column{0.5\textwidth}
+      \centering
+      \begin{tabular}{lc}
+        \toprule
+        Method & Acc. \\
+        \midrule
+        Baseline & 81.2 \\
+        Ours & \textbf{89.7} \\
+        \bottomrule
+      \end{tabular}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Thank you}
+  \centering Questions?
+\end{frame}
+
+\end{document}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Overleaf Copy — Local LaTeX Editor</title>
+  <link rel="stylesheet" href="/static/vendor/codemirror/codemirror.css">
+  <link rel="stylesheet" href="/static/vendor/codemirror/dialog.css">
+  <link rel="stylesheet" href="/static/vendor/codemirror/show-hint.css">
+  <link rel="stylesheet" href="/static/vendor/codemirror/material-darker.css">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- ======================= Dashboard (project list) ======================= -->
+<div id="dashboard" class="view">
+  <header class="topbar">
+    <div class="brand"><span class="logo">∂</span> Overleaf Copy <small>local LaTeX editor</small></div>
+    <div class="spacer"></div>
+    <button id="themeToggleDash" class="btn ghost" title="Toggle dark mode">☾ Theme</button>
+  </header>
+  <main class="dash-main">
+    <section class="dash-actions">
+      <h2>New project</h2>
+      <form id="newProjectForm" class="row">
+        <input id="newProjectName" placeholder="Project name, e.g. icml-2027-paper" required maxlength="80">
+        <select id="newProjectTemplate"></select>
+        <button class="btn primary" type="submit">Create</button>
+      </form>
+      <p id="templateDesc" class="muted"></p>
+      <div class="row">
+        <label class="btn" for="importZip">Import .zip (e.g. from Overleaf)…</label>
+        <input id="importZip" type="file" accept=".zip" hidden>
+      </div>
+      <div id="toolStatus" class="tool-status"></div>
+    </section>
+    <section>
+      <h2>Your projects</h2>
+      <input id="projectFilter" placeholder="Filter projects…" class="filter">
+      <table class="project-table">
+        <thead><tr><th>Name</th><th>Last modified</th><th></th></tr></thead>
+        <tbody id="projectList"></tbody>
+      </table>
+      <p id="noProjects" class="muted" hidden>No projects yet — create one above.</p>
+    </section>
+  </main>
+</div>
+
+<!-- ============================ Editor view ============================ -->
+<div id="editorView" class="view" hidden>
+  <header class="topbar">
+    <button id="backToDash" class="btn ghost" title="All projects">☰ Projects</button>
+    <div class="brand small"><span class="logo">∂</span> <span id="projectTitle"></span></div>
+    <div class="spacer"></div>
+    <span id="saveStatus" class="muted">Saved</span>
+    <span id="wordCount" class="muted clickable" title="Word count (click to refresh)"></span>
+    <select id="engineSelect" title="TeX engine">
+      <option value="pdflatex">pdfLaTeX</option>
+      <option value="xelatex">XeLaTeX</option>
+      <option value="lualatex">LuaLaTeX</option>
+    </select>
+    <select id="mainSelect" title="Main document"></select>
+    <label class="toggle" title="Recompile automatically after you stop typing">
+      <input type="checkbox" id="autoCompile"> Auto
+    </label>
+    <div class="btn-group">
+      <button id="compileBtn" class="btn primary" title="Compile (Ctrl+S / Ctrl+Enter)">▶ Recompile</button>
+      <button id="cleanCompileBtn" class="btn primary narrow" title="Clear build cache and recompile">⟲</button>
+    </div>
+    <a id="downloadPdf" class="btn" title="Download PDF">⤓ PDF</a>
+    <a id="downloadZip" class="btn" title="Download project as .zip">⤓ Zip</a>
+    <button id="themeToggle" class="btn ghost" title="Toggle dark mode">☾ Theme</button>
+  </header>
+
+  <div class="workspace" id="workspace">
+    <!-- File tree + outline -->
+    <aside class="sidebar" id="sidebar">
+      <div class="panel-head">
+        <span>Files</span>
+        <div class="icons">
+          <button id="newFileBtn" title="New file">＋📄</button>
+          <button id="newFolderBtn" title="New folder">＋📁</button>
+          <button id="uploadBtn" title="Upload files (images, .bib, .cls…)">⤒</button>
+          <input id="uploadInput" type="file" multiple hidden>
+        </div>
+      </div>
+      <div id="fileTree" class="file-tree"></div>
+      <div class="panel-head"><span>Outline</span></div>
+      <div id="outline" class="outline"></div>
+    </aside>
+    <div class="gutter" data-resize="sidebar"></div>
+
+    <!-- Editor -->
+    <section class="editor-pane" id="editorPane">
+      <div id="tabs" class="tabs"></div>
+      <div id="editorHost" class="editor-host"></div>
+      <div id="binaryPreview" class="binary-preview" hidden></div>
+      <div id="emptyEditor" class="empty-editor" hidden>Select a file on the left to start editing.</div>
+    </section>
+    <div class="gutter" data-resize="editorPane"></div>
+
+    <!-- PDF / logs -->
+    <section class="preview-pane" id="previewPane">
+      <div class="panel-head">
+        <div class="seg">
+          <button id="showPdf" class="active">PDF</button>
+          <button id="showLogs">Logs &amp; errors <span id="issueBadge" class="badge" hidden></span></button>
+        </div>
+        <div class="icons">
+          <button id="syncToPdf" title="Show the PDF page for the cursor position (SyncTeX)">→ PDF</button>
+          <button id="openPdfTab" title="Open PDF in a new tab">⧉</button>
+        </div>
+      </div>
+      <div id="pdfContainer" class="pdf-container">
+        <div id="pdfPlaceholder" class="muted center">Click <b>Recompile</b> to build your PDF.</div>
+        <iframe id="pdfFrame" title="PDF preview" hidden></iframe>
+        <div id="compilingOverlay" class="overlay" hidden><div class="spinner"></div> Compiling…</div>
+      </div>
+      <div id="logContainer" class="log-container" hidden>
+        <div id="issueList" class="issue-list"></div>
+        <details>
+          <summary>Raw log</summary>
+          <pre id="rawLog"></pre>
+        </details>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="/static/vendor/codemirror/codemirror.js"></script>
+<script src="/static/vendor/codemirror/stex.js"></script>
+<script src="/static/vendor/codemirror/dialog.js"></script>
+<script src="/static/vendor/codemirror/searchcursor.js"></script>
+<script src="/static/vendor/codemirror/search.js"></script>
+<script src="/static/vendor/codemirror/jump-to-line.js"></script>
+<script src="/static/vendor/codemirror/matchbrackets.js"></script>
+<script src="/static/vendor/codemirror/closebrackets.js"></script>
+<script src="/static/vendor/codemirror/active-line.js"></script>
+<script src="/static/vendor/codemirror/comment.js"></script>
+<script src="/static/vendor/codemirror/show-hint.js"></script>
+<script src="/static/latex-hints.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

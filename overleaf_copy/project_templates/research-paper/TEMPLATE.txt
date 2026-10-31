@@ -1,0 +1,1 @@
+Generic journal/conference paper: abstract, sections, figure, table, equations and a BibTeX bibliography.

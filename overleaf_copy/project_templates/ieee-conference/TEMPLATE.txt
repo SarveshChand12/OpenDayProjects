@@ -1,0 +1,1 @@
+IEEE two-column conference paper (needs the IEEEtran class, included in TeX Live 'publishers' / MiKTeX).
