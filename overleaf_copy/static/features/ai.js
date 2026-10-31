@@ -51,11 +51,14 @@
     let from = cm.getCursor("from"), to = cm.getCursor("to");
     if (!cm.somethingSelected()) {
       // No selection: use the current paragraph.
+      // Stop at blank lines and structural commands (\documentclass, \begin{document}, \section…).
+      const boundary = (l) => l.trim() === "" || /^\s*\\(documentclass|usepackage|begin\{document\}|end\{document\}|maketitle|(sub)*section|chapter|paragraph)\b/.test(l);
       let a = from.line, b = from.line;
-      while (a > 0 && cm.getLine(a - 1).trim() !== "") a--;
-      while (b < cm.lineCount() - 1 && cm.getLine(b + 1).trim() !== "") b++;
+      while (a > 0 && !boundary(cm.getLine(a - 1)) && !boundary(cm.getLine(a))) a--;
+      while (b < cm.lineCount() - 1 && !boundary(cm.getLine(b + 1))) b++;
       from = { line: a, ch: 0 }; to = { line: b, ch: cm.getLine(b).length };
     }
+    const hadSelection = cm.somethingSelected();
     const text = cm.getRange(from, to);
     if (!text.trim()) return OC.toast("Select some text first.");
     const mark = cm.markText(from, to, { className: "cm-ai-target" });
@@ -76,7 +79,7 @@
       out.textContent = "Thinking…"; out.classList.add("muted");
       form.querySelectorAll("button[data-a]").forEach((b) => (b.disabled = true));
       try {
-        const r = await OC.api("POST", "/api/ai/run", { action, text, instruction: form.querySelector("[name=instr]").value, context: surrounding(cm, from, to) });
+        const r = await OC.api("POST", "/api/ai/run", { action, text, instruction: form.querySelector("[name=instr]").value, context: hadSelection ? surrounding(cm, from, to) : "" });
         result = r.result;
         out.textContent = r.result + (r.truncated ? "\n\n[output was cut off]" : "");
         out.classList.remove("muted");

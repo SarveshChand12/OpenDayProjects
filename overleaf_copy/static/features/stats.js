@@ -140,7 +140,7 @@
     const maxW = Math.max(1, ...r.sections.map((s) => s.words));
     let m;
     r.sections.forEach((s) => {
-      const row = OC.el(`<tr class="clickable"><td style="padding-left:${(s.level - 1) * 16 + 8}px"></td><td style="text-align:right">${s.words.toLocaleString()}</td>
+      const row = OC.el(`<tr class="clickable"><td style="padding-left:${Math.max(0, s.level - 1) * 16 + 8}px"></td><td style="text-align:right">${s.words.toLocaleString()}</td>
         <td style="width:40%"><div class="sec-bar" style="width:${(s.words / maxW) * 100}%"></div></td></tr>`);
       row.firstElementChild.textContent = s.title;
       row.onclick = () => { m.close(); OC.gotoLine(s.path, s.line); };

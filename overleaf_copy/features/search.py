@@ -9,6 +9,7 @@ from flask import Blueprint, jsonify, request
 from core import err, is_text_file, iter_project_files, project_dir, read_text
 
 bp = Blueprint("search", __name__)
+error_type = re.error
 MAX_RESULTS = 2000
 
 
@@ -67,19 +68,40 @@ def api_replace(name):
     except ValueError as e:
         return err(str(e))
     repl = data.get("replacement", "")
-    is_regex = bool(data.get("regex"))
+    is_regex = str(data.get("regex", "0")) in ("1", "true", "True")
     only = set(data.get("paths") or []) or None
-    changed = {}
-    for path, rel in _files(root, only):
-        text = read_text(path)
-        if is_regex:
+
+    # The replacement is LaTeX, so backslashes are literal (\textbf stays \textbf). In regex mode
+    # \1..\99 and \g<name> insert captured groups; nothing else is special.
+    group_ref = re.compile(r"\\(\d{1,2})|\\g<(\w+)>")
+
+    def expand(m: re.Match) -> str:
+        if not is_regex:
+            return repl
+
+        def sub(g: re.Match) -> str:
+            ref = g.group(1) or g.group(2)
             try:
-                new, n = rx.subn(repl, text)
-            except (re.error, IndexError) as e:
-                return err(f"Bad replacement: {e}")
-        else:
-            new, n = rx.subn(lambda _m: repl, text)
-        if n:
-            path.write_text(new, encoding="utf-8", newline="")
-            changed[rel] = n
+                val = m.group(int(ref) if ref.isdigit() else ref)
+            except (IndexError, error_type):
+                raise ValueError(f"The replacement refers to group {ref}, which the pattern doesn't have.")
+            return val or ""
+        return group_ref.sub(sub, repl)
+
+    changed = {}
+    try:
+        for path, rel in _files(root, only):
+            text = read_text(path)
+            # Match line by line, exactly like the search, so the counts agree.
+            out, n = [], 0
+            for line in text.splitlines(keepends=True):
+                body = line.rstrip("\r\n")
+                new, k = rx.subn(expand, body)
+                n += k
+                out.append(new + line[len(body):])
+            if n:
+                path.write_text("".join(out), encoding="utf-8", newline="")
+                changed[rel] = n
+    except ValueError as e:
+        return err(str(e))
     return jsonify({"changed": changed, "total": sum(changed.values())})

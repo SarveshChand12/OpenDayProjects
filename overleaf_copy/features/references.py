@@ -123,8 +123,25 @@ def all_entries(root: Path) -> list[dict]:
     return out
 
 
+ACCENTS = {'"': "\u0308", "'": "\u0301", "`": "\u0300", "^": "\u0302", "~": "\u0303", "=": "\u0304",
+           ".": "\u0307", "c": "\u0327", "u": "\u0306", "v": "\u030c", "H": "\u030b", "k": "\u0328", "r": "\u030a"}
+SPECIAL = {"ss": "ß", "o": "ø", "O": "Ø", "ae": "æ", "AE": "Æ", "aa": "å", "AA": "Å", "oe": "œ", "OE": "Œ",
+           "l": "ł", "L": "Ł", "i": "ı", "j": "ȷ", "&": "&", "%": "%", "_": "_", "$": "$", "#": "#"}
+
+
 def _clean(s: str) -> str:
-    s = re.sub(r"\\(LaTeX|TeX|BibTeX|LaTeXe)\b\s*", r"\1", s or "")   # keep logos as words
+    """Turn BibTeX/LaTeX markup into readable text: accents, logos, maths, ~, braces."""
+    s = s or ""
+    s = re.sub(r"\\(LaTeX|TeX|BibTeX|LaTeXe)\b\s*", r"\1", s)              # keep logos as words
+    # Accents: {\"u}, \"{u}, \"u, \c{c}, \v{s} ...
+    s = re.sub(r"\\([\"'`^~=.])\s*\{?\s*(\\?[A-Za-z])\s*\}?",
+               lambda m: unicodedata.normalize("NFC", m.group(2).lstrip("\\") + ACCENTS[m.group(1)]), s)
+    s = re.sub(r"\\([cuvHkr])\s*\{\s*(\\?[A-Za-z])\s*\}",
+               lambda m: unicodedata.normalize("NFC", m.group(2).lstrip("\\") + ACCENTS[m.group(1)]), s)
+    s = re.sub(r"\\(ss|ae|AE|aa|AA|oe|OE|o|O|l|L)\b\s*|\\([&%_$#])", lambda m: SPECIAL[m.group(1) or m.group(2)], s)
+    # Maths: keep the content readable ($\alpha$-stable -> alpha-stable)
+    s = re.sub(r"\$([^$]*)\$", lambda m: re.sub(r"\\([A-Za-z]+)", r"\1", m.group(1)), s)
+    s = s.replace("~", " ").replace("--", "–")
     s = re.sub(r"\\[A-Za-z]+\s*", "", s)
     return re.sub(r"[{}]", "", s).strip()
 
@@ -135,14 +152,16 @@ def cited_keys(root: Path) -> tuple[dict[str, list], bool]:
     for path, rel in iter_project_files(root):
         if path.suffix.lower() not in (".tex", ".ltx"):
             continue
-        for i, line in enumerate(read_text(path).splitlines(), 1):
-            for m in CITE_RE.finditer(strip_comment(line)):
-                for k in m.group(1).split(","):
-                    k = k.strip()
-                    if k == "*":
-                        nocite_all = True
-                    elif k:
-                        cites.setdefault(k, []).append({"path": rel, "line": i})
+        # Whole file at once so \cite{a,<newline> b} spanning lines is understood.
+        text = "\n".join(strip_comment(l) for l in read_text(path).splitlines())
+        for m in CITE_RE.finditer(text):
+            line = text.count("\n", 0, m.start()) + 1
+            for k in m.group(1).split(","):
+                k = k.strip()
+                if k == "*":
+                    nocite_all = True
+                elif k:
+                    cites.setdefault(k, []).append({"path": rel, "line": line})
     return cites, nocite_all
 
 
@@ -168,7 +187,27 @@ def api_bib(name):
                     "cited": len(cites.get(e["key"], []))})
     bibs = sorted({p for p in (e["path"] for e in out)} |
                   {rel for path, rel in iter_project_files(root) if path.suffix.lower() == ".bib"})
-    return jsonify({"entries": out, "bib_files": bibs})
+    return jsonify({"entries": out, "bib_files": bibs, "default_bib": _main_bib(root, bibs)})
+
+
+def _main_bib(root: Path, bibs: list[str]) -> str | None:
+    """The .bib file the document actually uses (\\bibliography{x} or \\addbibresource{x.bib})."""
+    from core import load_settings
+    main = load_settings(root).get("main")
+    if not main:
+        return bibs[0] if bibs else None
+    text = "\n".join(strip_comment(l) for l in read_text(root / main).splitlines()) if (root / main).exists() else ""
+    base = Path(main).parent
+    for m in re.finditer(r"\\(?:bibliography|addbibresource)(?:\[[^\]]*\])?\{([^}]*)\}", text):
+        for name in m.group(1).split(","):
+            name = name.strip()
+            cand = (base / (name if name.endswith(".bib") else name + ".bib")).as_posix()
+            if cand in bibs:
+                return cand
+            if name.endswith(".bib") or not name:
+                continue
+            return cand                     # not created yet - the "Add" dialog will create it
+    return bibs[0] if bibs else None
 
 
 def _norm_title(t: str) -> str:

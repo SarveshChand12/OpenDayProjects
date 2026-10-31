@@ -164,16 +164,66 @@ INPUT_LINE_RE = re.compile(r"on input line (\d+)")
 BOX_RE = re.compile(r"^((?:Over|Under)full \\[hv]box .*?) (?:in paragraph |detected )?at lines? (\d+)")
 
 
+def unwrap_log(log: str) -> list[str]:
+    """TeX hard-wraps log lines at 79 characters; re-join them into logical lines."""
+    out, buf = [], ""
+    for line in log.split("\n"):
+        line = line.rstrip("\r")
+        buf += line
+        if len(line) == 79:
+            continue
+        out.append(buf)
+        buf = ""
+    if buf:
+        out.append(buf)
+    return out
+
+
+FILE_OPEN_RE = re.compile(r"\((\.{0,2}/[^\s()]+|[A-Za-z]:[\\/][^\s()]+|[\w\-.]+\.(?:tex|ltx|bbl|aux|toc|sty|cls|cfg|def|clo|fd))")
+
+
+def _project_rel(path: str | None) -> str | None:
+    """Map a path from the log to a project-relative path, or None for system files."""
+    if not path or path.startswith("/") or re.match(r"[A-Za-z]:[\\/]", path):
+        return None
+    rel = path[2:] if path.startswith("./") else path
+    if rel.startswith(BUILD_DIR_NAME + "/") or not rel.endswith((".tex", ".ltx")):
+        return None
+    return rel
+
+
 def parse_log(log: str, main_file: str | None) -> list[dict]:
     issues: list[dict] = []
-    lines = log.splitlines()
+    lines = unwrap_log(log)
+    stack: list[str | None] = []      # TeX's "(file ... )" nesting tells us which file is being read
+
+    def current_file() -> str | None:
+        for f in reversed(stack):
+            rel = _project_rel(f)
+            if rel:
+                return rel
+        return main_file
+
+    def track(text: str) -> None:
+        i = 0
+        while i < len(text):
+            c = text[i]
+            if c == "(":
+                m = FILE_OPEN_RE.match(text, i)
+                if m:
+                    stack.append(m.group(1))
+                    i = m.end()
+                    continue
+                stack.append(None)
+            elif c == ")" and stack:
+                stack.pop()
+            i += 1
+
     i = 0
     while i < len(lines):
         line = lines[i]
         m = FILE_LINE_ERROR_RE.match(line)
         if m:
-            message = m.group(3)
-            # Collect continuation lines until the l.<n> context line.
             context = []
             for j in range(i + 1, min(i + 8, len(lines))):
                 if lines[j].startswith("l.") or not lines[j].strip():
@@ -181,8 +231,8 @@ def parse_log(log: str, main_file: str | None) -> list[dict]:
                         context.append(lines[j])
                     break
                 context.append(lines[j])
-            issues.append({"level": "error", "file": m.group(1), "line": int(m.group(2)),
-                           "message": message, "context": "\n".join(context)})
+            issues.append({"level": "error", "file": _project_rel(m.group(1)) or m.group(1).lstrip("./"),
+                           "line": int(m.group(2)), "message": m.group(3), "context": "\n".join(context)})
             i += 1
             continue
         if line.startswith("! "):
@@ -192,7 +242,7 @@ def parse_log(log: str, main_file: str | None) -> list[dict]:
                 if lm:
                     line_no = int(lm.group(1))
                     break
-            issues.append({"level": "error", "file": main_file, "line": line_no,
+            issues.append({"level": "error", "file": current_file(), "line": line_no,
                            "message": line[2:], "context": ""})
             i += 1
             continue
@@ -200,12 +250,13 @@ def parse_log(log: str, main_file: str | None) -> list[dict]:
         if wm:
             text = wm.group(3)
             k = i + 1
-            while k < len(lines) and lines[k].startswith(" ") and len(text) < 400:
-                text += " " + lines[k].strip()
+            # Package warnings continue on lines indented with "(pkg)  " or spaces.
+            while k < len(lines) and re.match(r"^(\s+|\(\w+\)\s+)\S", lines[k]) and len(text) < 600:
+                text += " " + re.sub(r"^\(\w+\)\s+", "", lines[k]).strip()
                 k += 1
             src = wm.group(1) or wm.group(2)
             lm = INPUT_LINE_RE.search(text)
-            issues.append({"level": "warning", "file": main_file,
+            issues.append({"level": "warning", "file": current_file(),
                            "line": int(lm.group(1)) if lm else None,
                            "message": (f"[{src}] " if src else "") + text,
                            "context": ""})
@@ -213,8 +264,9 @@ def parse_log(log: str, main_file: str | None) -> list[dict]:
             continue
         bm = BOX_RE.match(line)
         if bm:
-            issues.append({"level": "typesetting", "file": main_file, "line": int(bm.group(2)),
+            issues.append({"level": "typesetting", "file": current_file(), "line": int(bm.group(2)),
                            "message": bm.group(1), "context": ""})
+        track(line)
         i += 1
 
     # De-duplicate (latexmk reruns produce repeated messages).
@@ -397,7 +449,7 @@ def strip_comment(line: str) -> str:
 def count_words(text: str) -> int:
     text = "\n".join(strip_comment(l) for l in text.splitlines())
     text = re.sub(r"\$\$.*?\$\$|\$.*?\$|\\\[.*?\\\]|\\\(.*?\\\)", " ", text, flags=re.S)
-    text = re.sub(r"\\begin\{(equation|align|gather|multline|eqnarray|tikzpicture|tabular)\*?\}.*?\\end\{\1\*?\}", " ", text, flags=re.S)
+    text = re.sub(r"\\begin\{(equation|align|gather|multline|eqnarray|tikzpicture|tabular|thebibliography|filecontents|verbatim|lstlisting)\*?\}.*?\\end\{\1\*?\}", " ", text, flags=re.S)
     text = re.sub(r"\\(?:begin|end|label|ref|eqref|autoref|cref|Cref|cite\w*|includegraphics|usepackage|input|include|bibliography\w*|documentclass|graphicspath)\*?(\[[^\]]*\])?\{[^}]*\}", " ", text)
     text = re.sub(r"\\[A-Za-z@]+\*?", " ", text)
     return len(re.findall(r"[A-Za-z0-9\u00C0-\u024F][A-Za-z0-9\u00C0-\u024F'\-]*", text))

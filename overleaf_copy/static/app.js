@@ -295,7 +295,7 @@
     refreshKeys();
     updateWordCount();
     // Show an existing PDF straight away if one was built before.
-    fetch(`/api/projects/${enc(name)}/pdf`, { method: "HEAD" }).then((r) => { if (r.ok) showPdf(); });
+    if (state.hasPdf) showPdf();
     emit("projectOpened", name);
   }
 
@@ -303,6 +303,7 @@
     const data = await api("GET", `/api/projects/${enc(state.project)}`);
     state.tree = data.tree;
     state.settings = data.settings;
+    state.hasPdf = data.has_pdf;
     $("#engineSelect").value = data.settings.engine || "pdflatex";
     renderMainSelect();
     renderTree();

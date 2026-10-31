@@ -8,7 +8,7 @@
         <label title="Whole word"><input type="checkbox" id="srchWhole"> Word</label>
         <label title="Regular expression"><input type="checkbox" id="srchRegex"> .*</label>
       </div>
-      <input id="srchR" placeholder="Replace with…">
+      <input id="srchR" placeholder="Replace with… (regex: \\1 = first group)">
       <button class="btn" id="srchReplaceAll" style="width:100%; margin-top:4px">Replace all</button>
       <div id="srchInfo" class="hint muted" style="margin:6px 0"></div>
       <div id="srchResults"></div>

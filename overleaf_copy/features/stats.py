@@ -54,7 +54,14 @@ def section_counts(root: Path, main: str) -> tuple[list[dict], int]:
 def _record(root: Path, total: int) -> dict:
     settings = load_settings(root)
     log = settings.get("word_log") or {}
+    starts = settings.get("day_start") or {}
     today = dt.date.today().isoformat()
+    if today not in starts:
+        # First time we see the paper today: remember where the day started.
+        prev_days = [k for k in sorted(log) if k < today]
+        starts[today] = log[prev_days[-1]] if prev_days else log.get(today, total)
+        settings["day_start"] = {k: v for k, v in starts.items() if k >= (dt.date.today() - dt.timedelta(days=40)).isoformat()}
+        save_settings(root, settings)
     if log.get(today) != total:
         log[today] = total
         # keep a year of history
@@ -96,7 +103,8 @@ def api_stats(name):
     for i in range(30):
         d = (window_start + dt.timedelta(days=i)).isoformat()
         if d in log:
-            written = log[d] - prev_total if prev_total is not None else 0
+            base = prev_total if prev_total is not None else (settings.get("day_start") or {}).get(d)
+            written = log[d] - base if base is not None else 0
             prev_total = log[d]
             days.append({"date": d, "total": log[d], "written": written})
         else:

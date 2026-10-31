@@ -47,6 +47,10 @@
     const ext = (file.type.split("/")[1] || "png").replace("jpeg", "jpg").replace("svg+xml", "svg");
     const stamp = new Date().toISOString().replace(/[-:]/g, "").replace("T", "-").slice(0, 15);
     let name = file.name && !/^image\.\w+$/.test(file.name) ? file.name.replace(/[^A-Za-z0-9._-]/g, "_") : `pasted-${stamp}.${ext}`;
+    // Never overwrite an existing figure: add -1, -2, ... if the name is taken.
+    const dot = name.lastIndexOf(".");
+    const stem = dot > 0 ? name.slice(0, dot) : name, extn = dot > 0 ? name.slice(dot) : "";
+    for (let n = 1; OC.findNode(`figures/${name}`); n++) name = `${stem}-${n}${extn}`;
     if (!OC.findNode("figures")) {
       await OC.api("POST", OC.projectUrl("/new"), { path: "figures", type: "folder" }).catch(() => {});
     }
@@ -66,9 +70,16 @@
       `  \\label{fig:${label}}`,
       "\\end{figure}",
     ].join("\n" + indent);
-    const from = cm.getCursor();
-    cm.replaceSelection(snippet + "\n");
-    cm.setCursor({ line: from.line + 3, ch: indent.length + "  \\caption{".length });
+    let from = cm.getCursor();
+    const lineText = cm.getLine(from.line);
+    let prefix = "";
+    if (lineText.trim() !== "") {
+      // Insert after the current line rather than splitting it.
+      from = { line: from.line, ch: lineText.length };
+      prefix = "\n" + indent;
+    }
+    cm.replaceRange(prefix + snippet + "\n", from, from);
+    cm.setCursor({ line: from.line + (prefix ? 1 : 0) + 3, ch: indent.length + "  \\caption{".length });
     cm.focus();
     await OC.refreshTree();
     await ensurePackage("graphicx");
@@ -118,7 +129,25 @@
     }
     const sample = lines.slice(0, 5).join("\n");
     const delim = sample.includes("\t") ? "\t" : (sample.split(";").length > sample.split(",").length ? ";" : ",");
-    return lines.map((l) => splitCsv(l, delim));
+    if (delim === "\t") return lines.map((l) => splitCsv(l, delim));
+    return parseCsv(text.replace(/\r/g, ""), delim).filter((r) => r.some((c) => c !== ""));
+  }
+  /** RFC-4180-style CSV: quoted fields may contain the delimiter, "" and newlines. */
+  function parseCsv(text, d) {
+    const rows = []; let row = []; let cur = ""; let q = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (q) {
+        if (ch === '"' && text[i + 1] === '"') { cur += '"'; i++; }
+        else if (ch === '"') q = false;
+        else cur += ch;
+      } else if (ch === '"') q = true;
+      else if (ch === d) { row.push(cur.trim()); cur = ""; }
+      else if (ch === "\n") { row.push(cur.trim()); rows.push(row); row = []; cur = ""; }
+      else cur += ch;
+    }
+    if (cur !== "" || row.length) { row.push(cur.trim()); rows.push(row); }
+    return rows;
   }
   function splitCsv(line, d) {
     if (d === "\t") return line.split("\t").map((c) => c.trim());
@@ -133,7 +162,8 @@
     out.push(cur.trim());
     return out;
   }
-  const escapeTex = (s) => s.replace(/\\/g, "\\textbackslash{}").replace(/([&%$#_{}])/g, "\\$1").replace(/~/g, "\\textasciitilde{}").replace(/\^/g, "\\textasciicircum{}");
+  const escapeTex = (s) => s.replace(/\\/g, "\u0000").replace(/([&%$#_{}])/g, "\\$1")
+    .replace(/~/g, "\\textasciitilde{}").replace(/\^/g, "\\textasciicircum{}").replace(/\u0000/g, "\\textbackslash{}");
   const isNum = (s) => /^[-+−]?\(?[$€£]?\d[\d,]*(\.\d+)?%?\)?$/.test(s.trim());
 
   function toLatex(rows, o) {
@@ -168,6 +198,15 @@
     return ["\\begin{table}[ht]", "  \\centering", `  \\caption{${o.caption}}`, `  \\label{tab:${o.label}}`, ...out, "\\end{table}"].join("\n");
   }
 
+  function uniqueLabel(caption) {
+    const used = new Set((window.LatexHints && LatexHints.keys.labels) || []);
+    const editorText = OC.editor ? OC.editor.getValue() : "";
+    const base = (caption || "").toLowerCase().replace(/\\[a-z]+/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) || "table";
+    let label = base;
+    for (let n = 2; used.has("tab:" + label) || editorText.includes(`\\label{tab:${label}}`); n++) label = `${base}-${n}`;
+    return label;
+  }
+
   function tableDialog(initial = "", onInsert) {
     const form = OC.el(`<div>
       <label class="field">Paste cells from Excel / Google Sheets, CSV, or a Markdown table</label>
@@ -194,7 +233,7 @@
     const opts = () => ({
       header: f("header").checked, boldHeader: f("boldHeader").checked, booktabs: f("booktabs").checked,
       float: f("float").checked, escape: f("escape").checked, vlines: f("vlines").checked, hlines: false,
-      align: f("align").value, caption: f("caption").value, label: f("label").value || "results",
+      align: f("align").value, caption: f("caption").value, label: f("label").value || uniqueLabel(f("caption").value),
     });
     const update = () => {
       const rows = parseTable(f("data").value);
@@ -224,7 +263,7 @@
     const coords = cm.cursorCoords(to, "window");
     const bar = OC.el(`<div class="paste-offer">That looks like spreadsheet data. <button class="btn primary">Convert to LaTeX table</button> <button class="btn ghost">✕</button></div>`);
     bar.style.left = Math.min(coords.left, window.innerWidth - 380) + "px";
-    bar.style.top = coords.bottom + 6 + "px";
+    bar.style.top = Math.max(8, Math.min(coords.bottom + 6, window.innerHeight - 60)) + "px";
     document.body.appendChild(bar);
     const mark = cm.markText(from, to);
     const close = () => { bar.remove(); };

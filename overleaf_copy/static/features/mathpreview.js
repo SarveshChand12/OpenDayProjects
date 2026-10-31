@@ -20,7 +20,7 @@
 
   /** Replace comments and escaped dollars with spaces so offsets stay the same. */
   function mask(text) {
-    return text.replace(/\\\$/g, "  ").replace(/(^|[^\\])%[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
+    return text.replace(/\\\\/g, "  ").replace(/\\\$/g, "  ").replace(/(^|[^\\])%[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
   }
 
   function collectMacros() {

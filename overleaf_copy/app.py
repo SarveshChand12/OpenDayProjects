@@ -176,7 +176,10 @@ def api_duplicate_project(name):
 @app.get("/api/projects/<name>")
 def api_project(name):
     root = project_dir(name)
-    return jsonify({"name": name, "tree": build_tree(root), "settings": load_settings(root)})
+    settings = load_settings(root)
+    pdf = core.build_pdf_path(root, settings)
+    return jsonify({"name": name, "tree": build_tree(root), "settings": settings,
+                    "has_pdf": bool(pdf and pdf.exists())})
 
 
 @app.put("/api/projects/<name>/settings")

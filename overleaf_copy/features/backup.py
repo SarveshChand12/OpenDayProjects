@@ -34,6 +34,10 @@ def _zip_to_folder(root: Path, name: str, folder: str, keep: int) -> str:
     dest_dir.mkdir(parents=True, exist_ok=True)
     stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S")
     dest = dest_dir / f"{name}-{stamp}.zip"
+    n = 1
+    while dest.exists():                       # two backups in the same second
+        dest = dest_dir / f"{name}-{stamp}-{n}.zip"
+        n += 1
     tmp = dest.with_suffix(".zip.part")
     with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zf:
         for path, rel in iter_project_files(root):
@@ -62,7 +66,7 @@ def _git_backup(root: Path, remote: str, branch: str) -> str:
         raise RuntimeError("git is not installed.")
     log = []
     if not (root / ".git").exists():
-        log.append(_git(root, "init"))
+        log.append(_git(root, "-c", "init.defaultBranch=main", "init", "--quiet") or "Initialised git repository.")
     gi = root / ".gitignore"
     if not gi.exists():
         gi.write_text(GITIGNORE, encoding="utf-8")
@@ -153,8 +157,12 @@ def api_set(name):
         if not p.is_absolute():
             return err("Use a full folder path, e.g. /Users/me/Dropbox/papers or C:\\Users\\me\\OneDrive\\papers")
         try:
-            if p.resolve() == root.resolve() or root.resolve() in p.resolve().parents:
-                return err("The backup folder can't be inside the project itself.")
+            dest = (p / name).resolve()      # zips are written to <folder>/<project name>/
+            projects = core.PROJECTS_DIR.resolve()
+            if dest == projects or projects in dest.parents or root.resolve() in p.resolve().parents \
+                    or p.resolve() == root.resolve():
+                return err("Choose a backup folder outside your projects folder "
+                           f"({projects}), otherwise backups would end up inside projects.")
         except OSError:
             pass
     cfg.update({

@@ -78,7 +78,9 @@
             if (line + d < doc.lineCount() && doc.getLine(line + d) === n.anchor) { line += d; break; }
           }
         }
-        bm = doc.setBookmark({ line, ch: 0 });
+        // insertLeft: text typed at column 0 (e.g. Enter) goes before the bookmark, so the note
+        // stays with its line's content instead of the new blank line.
+        bm = doc.setBookmark({ line, ch: 0 }, { insertLeft: true });
         bm.doc = doc;
         bookmarks.set(n.id, bm);
       }
@@ -155,6 +157,7 @@
       const gutters = cm.getOption("gutters");
       if (!gutters.includes("note-gutter")) cm.setOption("gutters", ["note-gutter", ...gutters]);
       cm.on("gutterClick", (cm2, line, gutter) => { if (gutter === "note-gutter") addAt(line); });
+      cm.on("change", OC.debounce(decorate, 200));   // keep markers where the bookmarks are
       cm.addKeyMap({ "Ctrl-Alt-M": (c) => addAt(c.getCursor().line), "Cmd-Alt-M": (c) => addAt(c.getCursor().line) });
     }
     load().catch(() => {});

@@ -5,6 +5,8 @@
   const OC = window.OC;
   let entries = [];
   let bibFiles = [];
+  let defaultBib = null;
+  const fold = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
   const body = OC.el(`<div class="side-body">
       <div class="row" style="gap:4px; margin-top:0">
@@ -23,14 +25,15 @@
     const r = await OC.api("GET", OC.projectUrl("/bib"));
     entries = r.entries;
     bibFiles = r.bib_files;
+    defaultBib = r.default_bib;
     render();
   }
 
   function render() {
-    const q = $("#refFilter").value.toLowerCase().trim();
+    const q = fold($("#refFilter").value.trim());
     const list = $("#refList");
     list.innerHTML = "";
-    const shown = entries.filter((e) => !q || [e.key, e.title, e.authors, e.year, e.venue].join(" ").toLowerCase().includes(q));
+    const shown = entries.filter((e) => !q || fold([e.key, e.title, e.authors, e.year, e.venue].join(" ")).includes(q));
     if (!entries.length) list.innerHTML = '<div class="muted">No .bib entries yet. Use “Add reference”.</div>';
     shown.forEach((e) => {
       const it = OC.el(`<div class="list-item" title="${OC.escapeHtml(e.path)}:${e.line}">
@@ -56,7 +59,16 @@
     if (!cm || !tab || tab.binary || !tab.path.endsWith(".tex")) return OC.toast("Open a .tex file and place the cursor where the citation goes.");
     const cur = cm.getCursor();
     const line = cm.getLine(cur.line);
-    const before = line.slice(0, cur.ch);
+    let before = line.slice(0, cur.ch);
+    // Cursor inside a cite's [optional argument]: act as if it were inside the {keys}.
+    const opt = before.match(/\\[A-Za-z]*cite[A-Za-z]*\*?(?:\[[^\]]*\])*\[[^\]]*$/);
+    if (opt) {
+      const brace = line.indexOf("{", cur.ch);
+      if (brace >= 0) { cm.setCursor({ line: cur.line, ch: brace + 1 }); return insertCite(key); }
+    }
+    // Cursor just after a cite's closing brace: merge into it.
+    const after = before.match(/\\[A-Za-z]*cite[A-Za-z]*\*?(?:\[[^\]]*\])*\{[^}]*\}$/);
+    if (after) { cm.setCursor({ line: cur.line, ch: cur.ch - 1 }); return insertCite(key); }
     const m = before.match(/\\[A-Za-z]*cite[A-Za-z]*\*?(?:\[[^\]]*\])*\{([^}]*)$/);
     if (m) {
       const close = line.indexOf("}", cur.ch);
@@ -76,7 +88,8 @@
   }
 
   // -------------------------------------------------------- add reference
-  function addDialog() {
+  async function addDialog() {
+    if (!bibFiles.length) await refresh().catch(() => {});
     const form = OC.el(`<div>
       <label class="field">DOI, arXiv ID or URL</label>
       <div class="row" style="margin:0"><input name="id" placeholder="10.1145/3065386   or   1706.03762   or   https://arxiv.org/abs/…" style="flex:1"><button class="btn" name="look">Look up</button></div>
@@ -84,7 +97,7 @@
       <label class="field">BibTeX</label>
       <textarea name="bib" rows="10" placeholder="@article{key,&#10;  author = {…},&#10;  title  = {…},&#10;  year   = {…}&#10;}"></textarea>
       <label class="field">Add to</label>
-      <select name="file">${(bibFiles.length ? bibFiles : ["references.bib"]).map((f) => `<option>${OC.escapeHtml(f)}</option>`).join("")}</select>
+      <select name="file">${[...new Set([defaultBib, ...bibFiles].filter(Boolean))].concat(bibFiles.length || defaultBib ? [] : ["references.bib"]).map((f) => `<option ${f === defaultBib ? "selected" : ""}>${OC.escapeHtml(f)}</option>`).join("")}</select>
       <label style="display:block;margin-top:8px"><input type="checkbox" name="cite" checked> Also cite it at the cursor</label>
     </div>`);
     const f = (n) => form.querySelector(`[name=${n}]`);

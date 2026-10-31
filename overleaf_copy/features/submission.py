@@ -18,7 +18,7 @@ from core import (BUILD_DIR_NAME, build_log_path, build_pdf_path, err, get_lock,
 bp = Blueprint("submission", __name__)
 
 TODO_COMMENT_RE = re.compile(r"(?<!\\)%.*?\b(TODO|FIXME|XXX|HACK)\b[:\s]*(.*)", re.I)
-TODO_CMD_RE = re.compile(r"\\(todo|fixme|hl|note|comment)\s*(?:\[[^\]]*\])?\{([^}]*)\}")
+TODO_CMD_RE = re.compile(r"\\(todo|fixme|hl|note|comment)\s*(?:\[[^\]]*\])?\{((?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)\}")
 UNDEF_RE = re.compile(r"(Reference|Citation) `([^']+)' on page \d+ undefined on input line (\d+)")
 EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 
@@ -51,7 +51,7 @@ def undefined_refs(root: Path) -> list[dict]:
         return []
     out, seen = [], set()
     # TeX hard-wraps log lines at 79 characters, so join them without adding spaces.
-    text = read_text(log).replace("\n", "")
+    text = "\n".join(core.unwrap_log(read_text(log)))
     sources = [(rel, read_text(p).splitlines()) for p, rel in iter_project_files(root)
                if p.suffix.lower() in (".tex", ".ltx")]
     for m in UNDEF_RE.finditer(text):

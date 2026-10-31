@@ -20,8 +20,6 @@ import threading
 import webbrowser
 from pathlib import Path
 
-from werkzeug.serving import make_server
-
 
 def default_projects_dir() -> Path:
     """Next to the code when run from source; in ~/Documents when packaged (read-only bundle)."""
@@ -41,7 +39,9 @@ def free_port() -> int:
 
 def start_server(projects_dir: Path, port: int | None = None):
     """Start the Flask app on 127.0.0.1 in a daemon thread; returns (server, url)."""
-    import app as oc_app  # imported here so --help works without Flask installed
+    from werkzeug.serving import make_server  # imported here so --help works without Flask installed
+
+    import app as oc_app
 
     oc_app.configure(projects_dir)
     port = port or free_port()
