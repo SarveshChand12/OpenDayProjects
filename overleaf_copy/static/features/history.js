@@ -147,21 +147,29 @@
   async function runLatexdiff(oldId, newId, style = "UNDERLINE") {
     if (!oldId || oldId === "empty") return OC.toast("Choose an older version to compare against.", true);
     OC.toast("Building changes PDF with latexdiff…");
+    // Open the tab now, while we still have the user's click, so popup blockers allow it.
+    const win = window.open("", "_blank");
+    if (win) win.document.write("<p style='font:16px sans-serif;padding:2em'>Building the changes PDF with latexdiff…</p>");
     try {
       const r = await OC.api("POST", OC.projectUrl("/latexdiff"), { old: oldId, new: newId || "current", style });
-      if (r.ok) {
-        window.open(OC.projectUrl(`/latexdiff.pdf?t=${Date.now()}`), "_blank");
+      const url = OC.projectUrl(`/latexdiff.pdf?t=${Date.now()}`);
+      if (r.ok && win && !win.closed) {
+        win.location = url;
         OC.toast("Changes PDF ready — opened in a new tab");
+      } else if (r.ok) {
+        OC.modal({ title: "Changes PDF ready", body: `<p><a href="${url}" target="_blank" rel="noopener">Open the changes PDF</a> · <a href="${url.replace("?", "?download=1&")}">Download</a></p>` });
       } else {
+        if (win) win.close();
         OC.modal({ title: "latexdiff failed", body: `<pre>${OC.escapeHtml(r.log || "")}</pre>`, wide: true });
       }
-    } catch (e) { OC.toast(e.message, true); }
+    } catch (e) { if (win) win.close(); OC.toast(e.message, true); }
   }
 
   function latexdiffDialog() {
     refresh().then(() => {
       if (!snapshots.length) return OC.toast("Save a version first (History panel), e.g. the one you submitted.", true);
-      const labelled = snapshots.find((s) => s.label) || snapshots[0];
+      // Prefer the user's own named versions over automatic "Before restoring…" ones.
+      const labelled = snapshots.find((s) => s.label && s.kind === "manual") || snapshots.find((s) => s.label && s.kind !== "before-restore") || snapshots[0];
       const wrap = OC.el(`<div>
         <p>Produce a PDF that marks everything added (blue, underlined) and deleted (red, struck out)
         since an earlier version. Journals usually ask for one when you resubmit.</p>

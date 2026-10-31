@@ -50,14 +50,34 @@ def undefined_refs(root: Path) -> list[dict]:
     if not log or not log.exists():
         return []
     out, seen = [], set()
-    text = read_text(log).replace("\n", " ")
+    # TeX hard-wraps log lines at 79 characters, so join them without adding spaces.
+    text = read_text(log).replace("\n", "")
+    sources = [(rel, read_text(p).splitlines()) for p, rel in iter_project_files(root)
+               if p.suffix.lower() in (".tex", ".ltx")]
     for m in UNDEF_RE.finditer(text):
         key = (m.group(1), m.group(2))
         if key in seen:
             continue
         seen.add(key)
-        out.append({"kind": m.group(1).lower(), "key": m.group(2), "line": int(m.group(3))})
+        line = int(m.group(3))
+        path, found_line = _locate_key(sources, m.group(2), line)
+        out.append({"kind": m.group(1).lower(), "key": m.group(2), "line": found_line or line, "path": path})
     return out
+
+
+def _locate_key(sources, key: str, line: int):
+    """Find which file uses an undefined \\ref/\\cite key; prefer the file where it's on `line`."""
+    pat = re.compile(r"\\[A-Za-z]*(ref|cite)[A-Za-z]*\*?\s*(\[[^\]]*\]\s*)*\{[^}]*\b" + re.escape(key) + r"\b")
+    first = (None, None)
+    for rel, lines in sources:
+        if 0 < line <= len(lines) and pat.search(lines[line - 1]):
+            return rel, line
+        if first[0] is None:
+            for i, l in enumerate(lines, 1):
+                if pat.search(strip_comment(l)):
+                    first = (rel, i)
+                    break
+    return first
 
 
 @bp.get("/api/projects/<name>/todos")
@@ -151,7 +171,7 @@ def api_check(name):
     undef = undefined_refs(root)
     multiply = re.findall(r"Label `([^']+)' multiply defined", log_text)
     if undef or multiply:
-        items = [{"path": main, "line": u["line"], "text": f"{u['kind']} '{u['key']}' is undefined"} for u in undef]
+        items = [{"path": u.get("path") or main, "line": u["line"], "text": f"{u['kind']} '{u['key']}' is undefined"} for u in undef]
         items += [{"path": None, "line": None, "text": f"label '{l}' is defined more than once"} for l in sorted(set(multiply))]
         checks.append(_check("refs", "All references and citations resolve", "fail",
                              f"{len(undef)} undefined, {len(set(multiply))} duplicate label(s). They show as ?? in the PDF.", items))
@@ -185,8 +205,9 @@ def api_check(name):
                                      [{"path": None, "line": None, "text": f"{f['name']} ({f['type']})"} for f in not_emb]))
             elif type3:
                 checks.append(_check("fonts", "All fonts embedded", "warn",
-                                     "Type 3 (bitmap) fonts found — usually from matplotlib figures. "
-                                     "Set matplotlib rcParams['pdf.fonttype'] = 42 or use \\usepackage[T1]{fontenc}.",
+                                     "Type 3 (bitmap) fonts found. Common causes: matplotlib figures (set "
+                                     "rcParams['pdf.fonttype'] = 42 and re-export), or \\usepackage[T1]{fontenc} "
+                                     "without outline fonts installed (add \\usepackage{lmodern} or install cm-super).",
                                      [{"path": None, "line": None, "text": f["name"]} for f in type3]))
             else:
                 checks.append(_check("fonts", "All fonts embedded", "pass", f"{len(fonts)} font(s), all embedded."))
@@ -215,13 +236,22 @@ def api_check(name):
         for path, rel in iter_project_files(root):
             if path.suffix.lower() not in (".tex",):
                 continue
+            src = "\n".join(strip_comment(l) for l in read_text(path).splitlines())
+            # \author{...} may span several lines (names \\ affiliations), so match it balanced.
+            for am in re.finditer(r"\\author\s*(\[[^\]]*\])?\s*\{", src):
+                depth, j = 1, am.end()
+                while j < len(src) and depth:
+                    depth += {"{": 1, "}": -1}.get(src[j], 0)
+                    j += 1
+                body = src[am.end():j - 1]
+                visible = re.sub(r"\\(and|\\|thanks\{[^}]*\}|IEEEauthorblock[NA]|textit|inst\{[^}]*\})", " ", body)
+                if re.search(r"\w", visible) and not re.search(r"anonym", body, re.I):
+                    problems.append({"path": rel, "line": src.count("\n", 0, am.start()) + 1,
+                                     "text": "\\author{...} names the authors — use \\author{Anonymous} for review"})
             for i, line in enumerate(read_text(path).splitlines(), 1):
                 code = strip_comment(line)
                 if not code.strip():
                     continue
-                m = re.search(r"\\author\s*(\[[^\]]*\])?\{([^}]*)", code)
-                if m and m.group(2).strip() and not re.search(r"anonym", m.group(2), re.I):
-                    problems.append({"path": rel, "line": i, "text": "\\author{...} is not anonymous"})
                 if "\\thanks" in code:
                     problems.append({"path": rel, "line": i, "text": "\\thanks may reveal funding/affiliation"})
                 if EMAIL_RE.search(code):

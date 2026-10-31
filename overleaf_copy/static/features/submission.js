@@ -18,7 +18,7 @@
       r.undefined.forEach((u) => {
         const it = OC.el(`<div class="list-item">❓ <b>${OC.escapeHtml(u.key)}</b> <span class="sub">${u.kind}</span></div>`);
         // The log line number refers to whichever file contains it; search the project for the key.
-        it.onclick = () => findAndGo(u.key, main);
+        it.onclick = () => (u.path ? OC.gotoLine(u.path, u.line) : findAndGo(u.key, main));
         list.appendChild(it);
       });
     }

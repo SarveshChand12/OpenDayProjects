@@ -69,7 +69,7 @@ go online, and only when you use them.
   missing required fields, unused entries, and acronyms that need `{braces}`.
 
 ### Versions, submission & backup
-- **🕘 Version history**: versions are saved automatically when you compile (and every 5 minutes while editing),
+- **🕘 Version history**: versions are saved automatically when you compile (at most one every 2 minutes) and every 5 minutes while editing,
   and you can save **named versions** ("Submitted to ICML"). You can compare any two versions file by file, then
   **restore one file or the whole project**. A restore saves the current state first, so it can be undone.
 - **Changes PDF (latexdiff)**: one click makes a PDF marking everything added and deleted since an earlier

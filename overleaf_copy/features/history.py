@@ -287,6 +287,8 @@ def api_restore(name, sid):
     if not snap:
         return err("Snapshot not found.", 404)
     rel = (request.get_json(force=True, silent=True) or {}).get("path")
+    if rel and rel not in snap["files"]:
+        return err("That file isn't in this snapshot.", 404)
     when = time.strftime("%Y-%m-%d %H:%M", time.localtime(snap["time"]))
     # Always keep the current state first, so a restore can itself be undone.
     take_snapshot(root, kind="before-restore", label=f"Before restoring {rel or 'project'} from {when}",
