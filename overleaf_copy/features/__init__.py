@@ -2,7 +2,7 @@
 
 import importlib
 
-MODULES = ["history", "proofing", "submission", "search", "references", "stats", "notes"]
+MODULES = ["history", "proofing", "submission", "search", "references", "stats", "notes", "backup", "ai"]
 
 
 def register(app):

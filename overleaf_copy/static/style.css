@@ -325,3 +325,5 @@ tr.clickable:hover td { background: var(--panel-2); cursor: pointer; }
 .CodeMirror-gutter-wrapper .note-marker:hover { transform: scale(1.2); }
 .list-item.resolved .note-text { text-decoration: line-through; color: var(--muted); }
 .note-text { white-space: pre-wrap; }
+.cm-ai-target { background: rgba(124, 92, 255, .14); }
+.ai-src, .ai-out { max-height: 45vh; min-height: 120px; }
