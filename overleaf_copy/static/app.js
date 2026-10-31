@@ -709,8 +709,8 @@
       markIssuesInEditor();
       emit("compiled", r);
       if (r.pdf) {
-        const page = await cursorPdfPage();
-        showPdf(page);
+        if (window.OC.pdfViewer) showPdf(null, true);
+        else showPdf(await cursorPdfPage());
       }
       if (!r.pdf || r.pdf_stale) {
         showLogs();
@@ -737,7 +737,16 @@
     }
   });
 
-  function showPdf(page) {
+  function showPdf(page, keepScroll) {
+    const viewer = window.OC && window.OC.pdfViewer;
+    if (viewer) {
+      // PDF.js viewer: keeps scroll position across recompiles.
+      $("#pdfFrame").hidden = true;
+      $("#pdfPlaceholder").hidden = true;
+      viewer.load(`/api/projects/${enc(state.project)}/pdf?t=${Date.now()}`, { page: keepScroll ? null : page, keepScroll });
+      switchPreview("pdf");
+      return;
+    }
     const frame = $("#pdfFrame");
     const url = `/api/projects/${enc(state.project)}/pdf?t=${Date.now()}` + (page ? `#page=${page}` : "");
     frame.hidden = false;

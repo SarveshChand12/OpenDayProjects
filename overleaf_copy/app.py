@@ -361,8 +361,55 @@ def api_synctex(name):
                              cwd=root, capture_output=True, text=True, timeout=10).stdout
     except (subprocess.TimeoutExpired, OSError):
         return jsonify({"page": None})
-    m = re.search(r"^Page:(\d+)", out, re.M)
-    return jsonify({"page": int(m.group(1)) if m else None})
+    # First record = best match. x/y are in PDF points from the page's top-left.
+    rec = {}
+    for key in ("Page", "x", "y", "h", "v", "W", "H"):
+        m = re.search(rf"^{key}:([-\d.]+)", out, re.M)
+        if m:
+            rec[key] = float(m.group(1))
+    if "Page" not in rec:
+        return jsonify({"page": None})
+    return jsonify({"page": int(rec["Page"]), "x": rec.get("x"), "y": rec.get("y"),
+                    "h": rec.get("h"), "v": rec.get("v"), "width": rec.get("W"), "height": rec.get("H")})
+
+
+@app.get("/api/projects/<name>/synctex/edit")
+def api_synctex_edit(name):
+    """Reverse search: PDF page + point (in PDF points from top-left) -> source file and line."""
+    root = project_dir(name)
+    settings = load_settings(root)
+    if not shutil.which("synctex") or not settings.get("main"):
+        return jsonify({"path": None, "reason": "synctex is not installed"})
+    pdf = root / BUILD_DIR_NAME / (Path(settings["main"]).stem + ".pdf")
+    if not pdf.exists():
+        return jsonify({"path": None})
+    try:
+        page = int(request.args["page"])
+        x = float(request.args["x"])
+        y = float(request.args["y"])
+    except (KeyError, ValueError):
+        return err("page, x and y are required.")
+    try:
+        out = subprocess.run(["synctex", "edit", "-o", f"{page}:{x:.2f}:{y:.2f}:{pdf}"],
+                             cwd=root, capture_output=True, text=True, timeout=10).stdout
+    except (subprocess.TimeoutExpired, OSError):
+        return jsonify({"path": None})
+    m_in = re.search(r"^Input:(.+)$", out, re.M)
+    m_ln = re.search(r"^Line:(\d+)", out, re.M)
+    if not m_in:
+        return jsonify({"path": None})
+    raw = Path(m_in.group(1).strip())
+    if not raw.is_absolute():
+        raw = (pdf.parent / raw)
+    candidates = [raw.resolve(), (root / m_in.group(1).strip()).resolve()]
+    for cand in candidates:
+        try:
+            rel = cand.relative_to(root.resolve()).as_posix()
+        except ValueError:
+            continue
+        if cand.is_file() and not rel.startswith(BUILD_DIR_NAME):
+            return jsonify({"path": rel, "line": int(m_ln.group(1)) if m_ln else 1})
+    return jsonify({"path": None})
 
 
 @app.get("/api/projects/<name>/wordcount")

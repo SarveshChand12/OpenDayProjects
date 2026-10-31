@@ -304,12 +304,14 @@ def run_compile(root: Path, main: str, engine: str, clean: bool = False) -> dict
     pdf = build / f"{stem}.pdf"
     issues = parse_log(tex_log, main_rel)
     has_errors = any(i["level"] == "error" for i in issues)
-    ok = pdf.exists() and pdf.stat().st_mtime >= started - 1 and not has_errors
+    # latexmk skips the rebuild (rc 0, PDF untouched) when nothing changed - that PDF is current.
+    fresh = pdf.exists() and (pdf.stat().st_mtime >= started - 1 or rc == 0)
+    ok = fresh and not has_errors
 
     return {
         "ok": ok,
         "pdf": pdf.exists(),
-        "pdf_stale": pdf.exists() and pdf.stat().st_mtime < started - 1,
+        "pdf_stale": pdf.exists() and not fresh,
         "issues": issues,
         "log": tex_log or "\n".join(log_chunks),
         "runner_log": "\n".join(log_chunks)[-30000:],

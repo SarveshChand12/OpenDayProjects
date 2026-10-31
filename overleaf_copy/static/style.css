@@ -263,3 +263,19 @@ mark { background: #ffe58a; color: #000; border-radius: 2px; }
 .diffview .add { background: rgba(19,138,82,.16); }
 .diffview .del { background: rgba(192,57,43,.16); text-decoration: line-through; text-decoration-color: rgba(192,57,43,.5); }
 .diffview .hunk { color: var(--info); background: var(--panel-2); margin-top: 6px; }
+/* ---------- PDF.js viewer ---------- */
+.pdfjs { position: absolute; inset: 0; display: flex; flex-direction: column; background: #525659; }
+.pdfjs-bar { display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--panel-2); border-bottom: 1px solid var(--border); font-size: 12px; flex-wrap: wrap; }
+.pdfjs-bar button { border: 1px solid var(--border); background: var(--panel); border-radius: 4px; cursor: pointer; padding: 2px 8px; color: var(--text); }
+.pdfjs-bar select { padding: 2px 4px; font-size: 12px; }
+.pdfjs-bar input { width: 52px; padding: 2px 4px; font-size: 12px; }
+.pdfjs-bar .sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+.pdfjs-bar .hint { margin-left: auto; font-size: 11px; }
+.pdfjs-scroll { flex: 1; overflow: auto; position: relative; }
+.pdfjs-pages { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px; min-width: fit-content; }
+.pdfjs-page { position: relative; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.35); flex-shrink: 0; }
+.pdfjs-page canvas { display: block; }
+.pdfjs.dark-pdf .pdfjs-page { background: #222; }
+.pdfjs.dark-pdf .pdfjs-page canvas { filter: invert(.88) hue-rotate(180deg); }
+.sync-mark { position: absolute; background: rgba(255, 196, 0, .35); border: 2px solid rgba(255, 160, 0, .9); border-radius: 3px; pointer-events: none; animation: syncfade 2.5s ease-out forwards; }
+@keyframes syncfade { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
