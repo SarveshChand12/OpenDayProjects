@@ -108,7 +108,8 @@
       (engines.length
         ? `<span class="ok">✔ TeX engines: ${engines.join(", ")}</span>`
         : `<span class="missing">✘ No LaTeX engine found on this machine — install TeX Live, MiKTeX or MacTeX to compile.</span>`) +
-      ` · latexmk: ${tools.latexmk ? '<span class="ok">yes</span>' : '<span class="missing">no</span>'}` +
+      ` · latexmk: ${tools.latexmk ? '<span class="ok">yes</span>' : (tools.perl_missing || []).includes("latexmk") ? '<span class="missing">needs Perl</span>' : "no (built-in pipeline used)"}` +
+      ((tools.perl_missing || []).length ? `<br><span class="muted">⚠ ${tools.perl_missing.join(", ")} need Perl, which isn't installed (usual with MiKTeX). Compiling still works with the built-in pipeline; install <a href="https://strawberryperl.com" target="_blank" rel="noopener">Strawberry Perl</a> and restart to enable latexmk and the changes PDF.</span>` : "") +
       ` · SyncTeX: ${tools.synctex ? '<span class="ok">yes</span>' : "no"}` +
       `<br><span class="muted">Projects are stored in <code>${status.projects_dir}</code></span>`;
 

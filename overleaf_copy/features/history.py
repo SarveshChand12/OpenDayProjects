@@ -337,7 +337,10 @@ def api_latexdiff(name):
     root = project_dir(name)
     data = request.get_json(force=True, silent=True) or {}
     tools = which_tools()
-    if not shutil.which("latexdiff"):
+    if not core.tool_works("latexdiff"):
+        if shutil.which("latexdiff"):
+            return err("latexdiff is installed but needs Perl, which wasn't found. On Windows with "
+                       "MiKTeX, install Strawberry Perl (strawberryperl.com) and restart Overleaf Copy.")
         return err("latexdiff is not installed. It ships with TeX Live / MiKTeX "
                    "(on Debian/Ubuntu: sudo apt install latexdiff).")
     settings = load_settings(root)

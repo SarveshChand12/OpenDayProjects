@@ -143,10 +143,53 @@ def build_tree(root: Path, current: Path | None = None) -> list[dict]:
     return entries
 
 
+# latexmk, latexdiff and texcount are Perl scripts. TeX Live (incl. Windows) ships Perl, but
+# MiKTeX does not: its latexmk.exe launcher exists yet fails with "could not find the script
+# engine 'perl'". So for these tools "on PATH" isn't enough - we check they actually run.
+PERL_TOOLS = {"latexmk": ["-v"], "latexdiff": ["--version"], "texcount": ["-ver"]}
+_broken_tools: set[str] = set()
+_tool_cache: dict[str, bool] = {}
+
+
+def _looks_like_missing_perl(output: str) -> bool:
+    o = output.lower()
+    return "script engine" in o or ("perl" in o and ("not found" in o or "could not find" in o
+                                                    or "is not recognized" in o or "no such file" in o))
+
+
+def tool_works(tool: str) -> bool:
+    """True if `tool` is on PATH and (for Perl-based tools) can actually start."""
+    if tool in _broken_tools or os.environ.get(f"OVERLEAF_COPY_NO_{tool.upper()}"):
+        return False
+    if tool in _tool_cache:
+        return _tool_cache[tool]
+    ok = shutil.which(tool) is not None
+    if ok and tool in PERL_TOOLS:
+        try:
+            p = subprocess.run([tool, *PERL_TOOLS[tool]], capture_output=True, text=True, errors="replace",
+                               timeout=30, stdin=subprocess.DEVNULL)
+            ok = p.returncode == 0 and not _looks_like_missing_perl(p.stdout + p.stderr)
+        except (OSError, subprocess.TimeoutExpired):
+            ok = False
+    _tool_cache[tool] = ok
+    return ok
+
+
+def mark_broken(tool: str) -> None:
+    _broken_tools.add(tool)
+
+
+def perl_missing() -> list[str]:
+    """Perl-based tools that are installed but can't run (typically MiKTeX without Perl)."""
+    return [t for t in PERL_TOOLS if shutil.which(t) and not tool_works(t)]
+
+
 def which_tools() -> dict:
-    return {tool: shutil.which(tool) is not None
-            for tool in ("latexmk", "pdflatex", "xelatex", "lualatex", "bibtex", "biber",
-                         "synctex", "texcount")}
+    tools = {tool: (tool_works(tool) if tool in PERL_TOOLS else shutil.which(tool) is not None)
+             for tool in ("latexmk", "pdflatex", "xelatex", "lualatex", "bibtex", "biber",
+                          "synctex", "texcount", "latexdiff", "makeindex")}
+    tools["perl_missing"] = perl_missing()
+    return tools
 
 
 def get_lock(name: str) -> threading.Lock:
@@ -282,6 +325,44 @@ def parse_log(log: str, main_file: str | None) -> list[dict]:
 # --------------------------------------------------------------------------- #
 # Compilation
 # --------------------------------------------------------------------------- #
+def _manual_pipeline(run, build: Path, root: Path, engine: str, common: list[str], main_rel: str,
+                     stem: str, tools: dict) -> int:
+    """Compile without latexmk: engine, then BibTeX/Biber and makeindex if needed, then rerun
+    the engine until references settle (at most 4 runs in total)."""
+    base = [engine, f"-output-directory={BUILD_DIR_NAME}", *common, main_rel]
+    rc = run(base)
+    aux, bcf, idx = build / f"{stem}.aux", build / f"{stem}.bcf", build / f"{stem}.idx"
+    log = build / f"{stem}.log"
+    if not aux.exists():
+        return rc                      # fatal error before LaTeX wrote anything useful
+    extra = False
+    if bcf.exists() and tools.get("biber"):
+        run(["biber", f"--input-directory={BUILD_DIR_NAME}", f"--output-directory={BUILD_DIR_NAME}", stem])
+        extra = True
+    elif tools.get("bibtex") and "\\bibdata" in aux.read_text(errors="ignore"):
+        # Run inside the build folder (like latexmk) - MiKTeX/TeX Live refuse to write into a
+        # dot-folder given as a path. BIBINPUTS/BSTINPUTS point back at the project.
+        run(["bibtex", stem], cwd=build)
+        extra = True
+    if idx.exists() and tools.get("makeindex"):
+        run(["makeindex", f"{stem}.idx"], cwd=build)
+        extra = True
+    runs = 1
+    rerun_re = re.compile(r"Rerun to get|Label\(s\) may have changed|There were undefined references|"
+                          r"Please \(re\)run Biber|rerun LaTeX", re.I)
+    while runs < 4:
+        log_text = log.read_text(errors="replace") if log.exists() else ""
+        if not extra and not rerun_re.search(log_text):
+            break
+        extra = False
+        rc = run(base)
+        runs += 1
+        if runs >= 3 and "There were undefined references" in (log.read_text(errors="replace") if log.exists() else "") \
+                and not re.search(r"Rerun to get|may have changed", log.read_text(errors="replace")):
+            break                      # genuinely undefined - more runs won't help
+    return rc
+
+
 def run_compile(root: Path, main: str, engine: str, clean: bool = False) -> dict:
     build = root / BUILD_DIR_NAME
     if clean and build.exists():
@@ -305,6 +386,7 @@ def run_compile(root: Path, main: str, engine: str, clean: bool = False) -> dict
     env["TEXINPUTS"] = f".{sep}{root}{sep}{env.get('TEXINPUTS', '')}"
     env["BIBINPUTS"] = f".{sep}{root}{sep}{env.get('BIBINPUTS', '')}"
     env["BSTINPUTS"] = f".{sep}{root}{sep}{env.get('BSTINPUTS', '')}"
+    env["INDEXSTYLE"] = f".{sep}{root}{sep}{env.get('INDEXSTYLE', '')}"
 
     # nonstopmode (without -halt-on-error) behaves like Overleaf: a PDF is still
     # produced where possible and errors are reported alongside it.
@@ -312,10 +394,12 @@ def run_compile(root: Path, main: str, engine: str, clean: bool = False) -> dict
     log_chunks: list[str] = []
     started = time.time()
 
-    def run(cmd: list[str]) -> int:
+    last_output = [""]
+
+    def run(cmd: list[str], cwd: Path | None = None) -> int:
         log_chunks.append("$ " + " ".join(cmd))
         try:
-            proc = subprocess.run(cmd, cwd=root, env=env, capture_output=True, text=True,
+            proc = subprocess.run(cmd, cwd=cwd or root, env=env, capture_output=True, text=True,
                                   errors="replace", timeout=COMPILE_TIMEOUT,
                                   stdin=subprocess.DEVNULL)
         except subprocess.TimeoutExpired:
@@ -324,6 +408,7 @@ def run_compile(root: Path, main: str, engine: str, clean: bool = False) -> dict
         except FileNotFoundError:
             log_chunks.append(f"!! Command not found: {cmd[0]}")
             return -1
+        last_output[0] = proc.stdout + proc.stderr
         log_chunks.append(proc.stdout[-20000:] + proc.stderr[-5000:])
         return proc.returncode
 
@@ -332,24 +417,20 @@ def run_compile(root: Path, main: str, engine: str, clean: bool = False) -> dict
                 "log": f"'{engine}' was not found on PATH. Install a TeX distribution "
                        f"(TeX Live, MiKTeX or MacTeX) and restart the server."}
 
+    used_latexmk = False
     if tools["latexmk"]:
         flag = {"pdflatex": "-pdf", "xelatex": "-xelatex", "lualatex": "-lualatex"}[engine]
         rc = run(["latexmk", flag, "-f", "-silent", f"-outdir={BUILD_DIR_NAME}",
                   *common, main_rel])
-    else:
-        # Manual pipeline: engine -> bibtex/biber -> engine -> engine
-        base = [engine, f"-output-directory={BUILD_DIR_NAME}", *common, main_rel]
-        rc = run(base)
-        aux = build / f"{stem}.aux"
-        bcf = build / f"{stem}.bcf"
-        if bcf.exists() and tools["biber"]:
-            run(["biber", f"--input-directory={BUILD_DIR_NAME}",
-                 f"--output-directory={BUILD_DIR_NAME}", stem])
-        elif aux.exists() and tools["bibtex"] and "\\bibdata" in aux.read_text(errors="ignore"):
-            run(["bibtex", f"{BUILD_DIR_NAME}/{stem}"])
-        if aux.exists():
-            run(base)
-            rc = run(base)
+        used_latexmk = True
+        if _looks_like_missing_perl(last_output[0]):
+            # e.g. MiKTeX without Perl: remember that and fall back to the built-in pipeline.
+            mark_broken("latexmk")
+            log_chunks.append("!! latexmk needs Perl, which isn't installed - using the built-in "
+                              "compile pipeline instead (install Strawberry Perl to use latexmk).")
+            used_latexmk = False
+    if not used_latexmk:
+        rc = _manual_pipeline(run, build, root, engine, common, main_rel, stem, tools)
 
     tex_log_path = build / f"{stem}.log"
     tex_log = tex_log_path.read_text(encoding="utf-8", errors="replace") if tex_log_path.exists() else ""

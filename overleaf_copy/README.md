@@ -98,6 +98,10 @@ go online, and only when you use them.
 1. **Python 3.9+**
 2. **A TeX distribution**:
    - Windows: [MiKTeX](https://miktex.org/) or [TeX Live](https://tug.org/texlive/)
+     - **MiKTeX doesn't include Perl**, which `latexmk`, `latexdiff` and `texcount` need. Overleaf Copy detects this
+       and compiles with its built-in pipeline instead (LaTeX → BibTeX/Biber → makeindex → reruns as needed), so
+       compiling works either way. To get `latexmk` and the changes PDF too, install
+       [Strawberry Perl](https://strawberryperl.com) and restart the app. TeX Live for Windows ships its own Perl.
    - macOS: [MacTeX](https://tug.org/mactex/)
    - Linux: `sudo apt install texlive-full latexmk`
      - For a smaller install: `texlive-latex-extra texlive-publishers texlive-fonts-extra texlive-bibtex-extra biber latexmk latexdiff`

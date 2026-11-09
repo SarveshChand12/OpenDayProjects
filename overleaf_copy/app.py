@@ -424,7 +424,7 @@ def api_wordcount(name):
     if not settings.get("main"):
         return jsonify({"words": 0, "detail": "No main file."})
     main = safe_path(root, settings["main"])
-    if shutil.which("texcount"):
+    if core.tool_works("texcount"):
         try:
             out = subprocess.run(["texcount", "-inc", "-total", "-brief", "-sum", main.name],
                                  cwd=main.parent, capture_output=True, text=True, timeout=30).stdout
@@ -517,7 +517,11 @@ def main():
     print("=" * 60)
     print(" Overleaf Copy - local LaTeX editor")
     print(f" Projects folder : {core.PROJECTS_DIR}")
-    print(f" TeX tools found : {', '.join(t for t, ok in tools.items() if ok) or 'NONE'}")
+    print(f" TeX tools found : {', '.join(t for t, ok in tools.items() if ok is True) or 'NONE'}")
+    if tools["perl_missing"]:
+        print(f" NOTE: {', '.join(tools['perl_missing'])} need Perl, which wasn't found (common with MiKTeX).")
+        print("       Compiling still works with the built-in pipeline. For latexmk/latexdiff,")
+        print("       install Strawberry Perl (https://strawberryperl.com) and restart.")
     if not any(tools[e] for e in ENGINES):
         print(" WARNING: no LaTeX engine found. Install TeX Live / MiKTeX / MacTeX to compile.")
     print(f" Open            : {url}")
