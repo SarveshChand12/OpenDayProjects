@@ -8,7 +8,7 @@
 
   // ---------------------------------------------------------- shared helpers
   /** Add \usepackage{pkg} to the main file's preamble if it isn't there. */
-  async function ensurePackage(pkg) {
+  async function ensurePackage(pkg, opts = "") {
     const main = OC.state.settings.main;
     if (!main) return false;
     const tab = OC.state.openTabs.find((t) => t.path === main && !t.binary);
@@ -23,7 +23,7 @@
     if (at < 0) return false;
     // insert after the last consecutive \usepackage line in the first block
     while (at + 1 < lines.length && /^\s*\\usepackage/.test(lines[at + 1])) at++;
-    const insertLine = `\\usepackage{${pkg}}`;
+    const insertLine = `\\usepackage${opts ? `[${opts}]` : ""}{${pkg}}`;
     if (tab) tab.doc.replaceRange(insertLine + "\n", { line: at + 1, ch: 0 });
     else {
       lines.splice(at + 1, 0, insertLine);

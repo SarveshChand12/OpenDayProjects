@@ -86,6 +86,33 @@ go online, and only when you use them.
 - **Writing stats & goals**: words per section, words written per day (30-day chart), a daily goal,
   a target length, and a **deadline countdown** in the top bar.
 
+### Word documents → LaTeX
+- **Import a Word document as a new project**: on the dashboard, click *📝 Import Word document*, or drop a `.docx`
+  onto the page. Choose a style (article, IEEE conference, or report/thesis) and you get a compilable LaTeX project,
+  with images in `figures/` and the original kept in `word/`.
+- **Import into an existing paper** (Tools → *Import Word document into this project*): a co-author's section
+  becomes `sections/<name>.tex`. One click adds `\input{…}` to your main file and loads any packages it needs.
+- **Convert a `.docx` you've uploaded**: click it in the file tree, then *Convert to LaTeX*.
+- What's converted:
+  - **Structure:** title and authors (IEEE author and affiliation blocks), headings (numbering like "1." or
+    "IV." removed), abstract, keywords/index terms.
+  - **Text:** bold, italic, underline, strikethrough, super/subscript, small caps, footnotes, links, page breaks.
+  - **Lists:** bulleted and numbered, including nested lists.
+  - **Tables:** merged cells, `booktabs` rules, and column widths taken from Word.
+  - **Images and captions:** "Figure 1:", "Fig. 1." and "TABLE I" captions are recognised.
+  - **Equations:** Word equations become real LaTeX maths (fractions, roots, sums/integrals, matrices, accents,
+    Greek letters …).
+  - **References:** a numbered reference list becomes `thebibliography`, and `[1]`, `[2, 3]` and `[4]–[6]`
+    in the text become `\cite{…}`.
+- Two converters:
+  - **Built-in**: no extra software. It understands paper structure, including citations and the reference list.
+  - **[Pandoc](https://pandoc.org)** (optional): a very robust general-purpose converter. Install Pandoc, or
+    `pip install -r requirements-word.txt` to get a bundled copy.
+- Old `.doc`, `.odt` and `.rtf` files are accepted when [LibreOffice](https://www.libreoffice.org) is installed.
+  They're converted to `.docx` first.
+- Charts, SmartArt and text boxes can't be converted. You'll get a reminder to paste them in as images.
+  EMF/WMF pictures must be converted to PNG or PDF for pdfLaTeX.
+
 ### Projects
 - Dashboard: create, rename, duplicate, delete, download `.zip`, and **import a zip** (e.g. Overleaf → Menu →
   Download → Source).
@@ -157,6 +184,7 @@ pyinstaller --name "Overleaf Copy" --windowed --noconfirm \
   --hidden-import features.history --hidden-import features.proofing --hidden-import features.submission \
   --hidden-import features.search --hidden-import features.references --hidden-import features.stats \
   --hidden-import features.notes --hidden-import features.backup --hidden-import features.ai \
+  --hidden-import features.word_import --hidden-import features.docx2tex \
   desktop.py
 ```
 
@@ -217,7 +245,9 @@ overleaf_copy/
 │   ├── stats.py          #   word counts, goals, deadline
 │   ├── notes.py          #   line notes
 │   ├── backup.py         #   folder / git backups
-│   └── ai.py             #   Claude writing assistant
+│   ├── ai.py             #   Claude writing assistant
+│   ├── word_import.py    #   Word import routes (built-in converter / Pandoc / LibreOffice)
+│   └── docx2tex.py       #   stand-alone .docx → LaTeX converter (python features/docx2tex.py file.docx)
 ├── static/               # single-page UI (vanilla JS); static/features/*.js mirror the modules above
 │   └── vendor/           # CodeMirror 5, PDF.js, KaTeX, Typo.js, Hunspell dictionaries (all bundled)
 ├── project_templates/

@@ -1040,7 +1040,7 @@
     state, api, enc, toast, debounce, on, emit, modal, el, escapeHtml,
     addPanel, showPanel, addTool,
     get editor() { return editor; },
-    activeTab, openFile, gotoLine, refreshTree, reloadOpenTabs, saveAll, compile,
+    activeTab, openFile, gotoLine, refreshTree, reloadOpenTabs, saveAll, compile, openProject,
     showPdf, showLogs, switchPreview, allFiles, findNode, currentFolder, uploadFiles,
     projectUrl: (suffix = "") => `/api/projects/${enc(state.project)}${suffix}`,
   };
